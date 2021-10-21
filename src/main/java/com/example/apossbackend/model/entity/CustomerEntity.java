@@ -39,5 +39,4 @@ public class CustomerEntity extends BaseEntity{
     @Column(name = "birth_day")
     private Date birthDay;
 
-
 }
