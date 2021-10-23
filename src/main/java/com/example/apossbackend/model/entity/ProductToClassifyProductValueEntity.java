@@ -1,9 +1,11 @@
 package com.example.apossbackend.model.entity;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import javax.persistence.*;
 
 @ToString
 @Getter
