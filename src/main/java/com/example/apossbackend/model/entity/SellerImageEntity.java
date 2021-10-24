@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -20,6 +18,8 @@ public class SellerImageEntity extends  BaseEntity{
     @Column(nullable = false, name = "image")
     private String imageUrl;
 
-    @Column(nullable = false)
-    private long seller;
+    @ManyToOne
+    @JoinColumn(name = "seller")
+    private SellerEntity seller;
+
 }

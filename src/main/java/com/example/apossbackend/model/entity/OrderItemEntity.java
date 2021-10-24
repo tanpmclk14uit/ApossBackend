@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -17,8 +15,9 @@ import javax.persistence.Table;
 @Table(name="order_item")
 public class OrderItemEntity extends BaseEntity {
 
-    @Column(name = "order_id", nullable = false)
-    private long order;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "order_id")
+    private OrderEntity order;
 
     @Column()
     private long product;

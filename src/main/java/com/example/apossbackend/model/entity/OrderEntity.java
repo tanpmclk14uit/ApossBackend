@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,8 +19,9 @@ import java.util.Date;
 @Table(name="orders")
 public class OrderEntity extends BaseEntity {
 
-    @Column(nullable = false)
-    private long customer;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "customer")
+    private CustomerEntity customer;
 
     @Column(name = "cancel_reason")
     private String cancelReason;
@@ -45,5 +46,19 @@ public class OrderEntity extends BaseEntity {
 
     @Column(nullable = false)
     private OrderStatus status;
+
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<OrderItemEntity> items = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<DeliveringStatusEntity> deliveryStatuses = new ArrayList<>();
 
 }

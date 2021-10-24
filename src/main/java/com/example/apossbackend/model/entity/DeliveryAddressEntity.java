@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -17,8 +15,9 @@ import javax.persistence.Table;
 @Table(name="delivery_address")
 public class DeliveryAddressEntity extends  BaseEntity{
 
-    @Column(nullable = false)
-    private long customer;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "customer")
+    private CustomerEntity customer;
 
     @Column(name = "phone", nullable = false)
     private String phoneNumber;
@@ -29,14 +28,17 @@ public class DeliveryAddressEntity extends  BaseEntity{
     @Column(nullable = false)
     private Boolean gender;
 
-    @Column(nullable = false)
-    private long province;
+    @OneToOne
+    @JoinColumn(nullable = false, name = "province")
+    private ProvinceEntity province;
 
-    @Column(nullable = false)
-    private long district;
+    @OneToOne
+    @JoinColumn(nullable = false, name ="district")
+    private DistrictEntity district;
 
-    @Column(nullable = false)
-    private long ward;
+    @OneToOne
+    @JoinColumn(nullable = false, name = "ward")
+    private WardEntity ward;
 
     @Column(nullable = false, name = "address_lane")
     private String addressLane;

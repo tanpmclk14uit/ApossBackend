@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -24,6 +21,7 @@ public class WardEntity{
     @Column
     private String name;
 
-    @Column
-    private long district;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "district")
+    private DistrictEntity district;
 }

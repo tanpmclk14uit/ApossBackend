@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,4 +31,25 @@ public class SellerEntity extends BaseEntity {
 
     @Column(name = "phone", nullable = false)
     private String phoneNumber;
+
+    @OneToMany(
+            mappedBy = "seller",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<SellerImageEntity> images = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "seller",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<SellerAddressEntity> addresses = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "seller",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ContactEntity> contacts = new ArrayList<>();
 }

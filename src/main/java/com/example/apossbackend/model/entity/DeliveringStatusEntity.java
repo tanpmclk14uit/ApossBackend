@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Getter
@@ -18,8 +16,9 @@ import java.util.Date;
 @Table(name="delivering_status")
 public class DeliveringStatusEntity extends BaseEntity {
 
-    @Column(nullable = false, name = "order_id")
-    private long order;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "order_id")
+    private OrderEntity order;
 
     @Column(nullable = false)
     private String status;
