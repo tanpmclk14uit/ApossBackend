@@ -1,12 +1,11 @@
 package com.example.apossbackend.service;
 
-import com.example.apossbackend.model.ProductResponse;
-import com.example.apossbackend.model.dto.ProductDTO;
-import org.springframework.data.domain.Page;
+import com.example.apossbackend.model.ProductsResponse;
+
 
 
 public interface ProductService {
 
-    ProductResponse getAllProduct(int pageNumber, int pageSize);
+    ProductsResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir);
 
 }

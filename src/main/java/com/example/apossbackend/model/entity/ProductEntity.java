@@ -21,6 +21,7 @@ public class ProductEntity extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kind_id",
+            referencedColumnName = "id",
             nullable = false
     )
     private KindEntity kind;

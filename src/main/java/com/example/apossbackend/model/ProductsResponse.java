@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponse {
+public class ProductsResponse {
     private List<ProductDTO> content;
     private int pageNo;
     private int pageSize;

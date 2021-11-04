@@ -36,6 +36,6 @@ public class KindEntity extends BaseEntity{
     private int totalProduct;
 
     @OneToMany(mappedBy = "kind", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductEntity> products= new HashSet<>();
+    private List<ProductEntity> products= new ArrayList<>();
 
 }
