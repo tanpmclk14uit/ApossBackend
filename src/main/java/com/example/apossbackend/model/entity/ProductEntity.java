@@ -1,16 +1,14 @@
 package com.example.apossbackend.model.entity;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
 
 import javax.persistence.*;
 
-@ToString
-@Getter
-@Setter
+@Data
 @Entity
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name= "product")
 public class ProductEntity extends BaseEntity{
 
@@ -20,10 +18,11 @@ public class ProductEntity extends BaseEntity{
     @Column(nullable = false)
     private int quantity;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kind_id",
-            referencedColumnName = "id",
-            nullable = false)
+            nullable = false
+    )
     private KindEntity kind;
 
     @Column(nullable = false)
@@ -31,4 +30,5 @@ public class ProductEntity extends BaseEntity{
 
     @Column(nullable = false)
     private String description;
+
 }
