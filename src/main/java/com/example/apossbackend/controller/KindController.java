@@ -4,6 +4,7 @@ import com.example.apossbackend.model.dto.KindDTO;
 import com.example.apossbackend.model.entity.KindEntity;
 import com.example.apossbackend.service.KindService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

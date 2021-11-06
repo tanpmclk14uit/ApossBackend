@@ -38,6 +38,8 @@ public class KindServiceImpl implements KindService {
             kindDTO.setRating(kindEntity.getRating());
             kindDTO.setTotalProducts(kindEntity.getTotalProduct());
             kindDTO.setTotalPurchases(kindEntity.getPurchased());
+            kindDTO.setCategory(kindEntity.getIndustry().getId());
+            kindDTO.setImage(kindEntity.getImage());
             kindDTOList.add(kindDTO);
         }
         return kindDTOList;

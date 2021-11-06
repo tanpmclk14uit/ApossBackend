@@ -15,5 +15,7 @@ public class KindDTO {
     private int totalPurchases;
     private int totalProducts;
     private float rating;
+    private String image;
     private List<ProductDTO> products;
+    private long category;
 }

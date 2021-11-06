@@ -35,6 +35,9 @@ public class KindEntity extends BaseEntity{
     @Column(nullable = false)
     private int totalProduct;
 
+    @Column(nullable = false)
+    private String image;
+
     @OneToMany(mappedBy = "kind", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products= new ArrayList<>();
 
