@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("industryImage")
+@RequestMapping("api/v1/industryImage")
 public class IndustryImageController {
 
     private final IndustryImageService industryImageService;

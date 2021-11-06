@@ -46,6 +46,9 @@ public class KindServiceImpl implements KindService {
     }
 
     private ProductDTO mapToProductDTO(ProductEntity productEntity) {
-        return modelMapper.map(productEntity, ProductDTO.class);
+        ProductDTO product = new ProductDTO();
+        product = modelMapper.map(productEntity, ProductDTO.class);
+        product.setImage("https://s.yimg.com/os/creatr-uploaded-images/2020-11/c891d158-28a0-11eb-afc3-f454cc2e3b45");
+        return product;
     }
 }

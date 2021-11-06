@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("kind")
+@RequestMapping("api/v1/kind")
 public class KindController {
 
     private final KindService kindService;
