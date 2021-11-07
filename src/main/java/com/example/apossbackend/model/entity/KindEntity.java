@@ -1,17 +1,19 @@
 package com.example.apossbackend.model.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-@ToString
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@RequiredArgsConstructor
 @Table(name= "kind")
 public class KindEntity extends BaseEntity{
 
@@ -32,4 +34,11 @@ public class KindEntity extends BaseEntity{
 
     @Column(nullable = false)
     private int totalProduct;
+
+    @Column(nullable = false)
+    private String image;
+
+    @OneToMany(mappedBy = "kind", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductEntity> products= new ArrayList<>();
+
 }

@@ -5,9 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @ToString
 @Getter
@@ -28,4 +27,7 @@ public class IndustryEntity extends BaseEntity{
 
     @Column(nullable = false)
     private int totalProduct;
+
+    @OneToMany(mappedBy = "industry", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IndustryImageEntity> industryImages;
 }
