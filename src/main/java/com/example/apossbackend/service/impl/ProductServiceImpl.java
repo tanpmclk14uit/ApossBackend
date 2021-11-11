@@ -50,17 +50,10 @@ public class ProductServiceImpl implements ProductService {
                 : Sort.by(sortBy).descending();
         //Pageable
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize,sort);
-
-        Page<ProductEntity> productsPage = productRepository.findAll(pageable);
+        System.out.println(keyword);
+        Page<ProductEntity> productsPage = productRepository.findAllByNameContains(keyword,pageable);
         List<ProductEntity> productEntityList = productsPage.getContent();
-        List<ProductEntity> productEntityListByKeyword = new ArrayList<>();
-        for (ProductEntity item: productEntityList) {
-            if (item.getName().toLowerCase(Locale.ROOT).contains(keyword.toLowerCase()))
-            {
-                productEntityListByKeyword.add(item);
-            }
-        }
-        List<ProductDTO> content = productEntityListByKeyword.stream().map(this::mapToProductDTO).collect( Collectors.toList());
+        List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect( Collectors.toList());
         ProductsResponse productsResponse = new ProductsResponse();
         productsResponse.setContent(content);
         productsResponse.setLast(productsPage.isLast());
