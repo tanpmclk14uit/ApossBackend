@@ -56,5 +56,4 @@ public class ProductServiceImpl implements ProductService {
         product.setImage("https://s.yimg.com/os/creatr-uploaded-images/2020-11/c891d158-28a0-11eb-afc3-f454cc2e3b45");
         return product;
     }
-
 }

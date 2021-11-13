@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,7 +16,9 @@ import java.util.List;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name="customer")
+@Table(name="customer", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"email"})
+})
 public class CustomerEntity extends BaseEntity{
 
     @Column(nullable = false)
@@ -37,6 +40,7 @@ public class CustomerEntity extends BaseEntity{
     private Boolean gender;
 
     @Column(name = "birth_day")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date birthDay;
 
     @OneToMany(
