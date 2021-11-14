@@ -28,22 +28,19 @@ public class CustomerServiceImpl implements CustomerService {
         this.modelMapper = modelMapper;
         this.tokenProvider = tokenProvider;
     }
-
     @Override
-    public CustomerDTO findUserInformationById(long id, String token) {
-        if(tokenProvider.validateToken(token)){
-            String userName = tokenProvider.getUsernameFromJWT(token);
-            CustomerEntity customer = customerRepository.findByEmail(userName).orElseThrow(
-                    ()-> new ResourceNotFoundException("Customer", "email", id));
-            if(customer.getId()==id){
-               return mapToCustomerDTO(customer);
-            }else{
-                throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid authentication");
-            }
-        }else {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Access token error");
+    public CustomerDTO findUserInformationByEmail(String email, String token) {
+        tokenProvider.validateToken(token);
+        String userName= tokenProvider.getUsernameFromJWT(token);
+        CustomerEntity customer = customerRepository.findByEmail(userName).orElseThrow(
+                ()-> new ResourceNotFoundException("Customer", "email", userName));
+        if(customer.getEmail().equals(email)){
+            return mapToCustomerDTO(customer);
+        }else{
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid authentication");
         }
     }
+
     private CustomerDTO mapToCustomerDTO(CustomerEntity customerEntity) {
         return modelMapper.map(customerEntity, CustomerDTO.class);
     }

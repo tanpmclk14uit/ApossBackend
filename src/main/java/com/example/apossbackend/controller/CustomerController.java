@@ -17,10 +17,12 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-   @GetMapping("/{id}")
-   public ResponseEntity<CustomerDTO> getCustomer(
-           @RequestBody String accessToken,
-           @PathVariable(name = "id") long  id){
-        return ResponseEntity.ok(customerService.findUserInformationById(id, accessToken));
+
+   @GetMapping("/{email}")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(
+            @RequestBody String accessToken,
+            @PathVariable(name ="email") String email
+   ){
+        return ResponseEntity.ok(customerService.findUserInformationByEmail(email, accessToken));
    }
 }

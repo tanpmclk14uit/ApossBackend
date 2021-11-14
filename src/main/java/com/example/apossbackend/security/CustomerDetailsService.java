@@ -25,10 +25,10 @@ public class CustomerDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        CustomerEntity customer = customerRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Customer not found with email" + email));
+        CustomerEntity customer = customerRepository.findByEmail(email).orElseThrow(()
+                -> new UsernameNotFoundException("Customer not found with email" + email));
         return new User(customer.getEmail(), customer.getPassword(), mapRolesToAuthorities(List.of("ROLE_USER")));
     }
-
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(List<String> roles){
         return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());

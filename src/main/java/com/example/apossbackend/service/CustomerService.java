@@ -6,5 +6,5 @@ import com.example.apossbackend.model.dto.SignUpDTO;
 import java.util.List;
 
 public interface CustomerService {
-    CustomerDTO findUserInformationById(long id, String token);
+    CustomerDTO findUserInformationByEmail(String email, String token);
 }
