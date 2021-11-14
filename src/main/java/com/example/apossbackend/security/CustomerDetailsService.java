@@ -29,6 +29,7 @@ public class CustomerDetailsService implements UserDetailsService {
         return new User(customer.getEmail(), customer.getPassword(), mapRolesToAuthorities(List.of("ROLE_USER")));
     }
 
+
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(List<String> roles){
         return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }

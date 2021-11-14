@@ -1,6 +1,9 @@
 package com.example.apossbackend.security;
 
+import com.example.apossbackend.exception.ApossBackendException;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,21 +32,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // get JWT (token) from http request
         String token = getJWTFromRequest(request);
         // validate token
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token)) {
             // get username from token
-            String username = jwtTokenProvider.getUsernameFromJWT(token);
-            // load user associated with token
-            UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
+            if (jwtTokenProvider.validateToken(token)) {
+                String username = jwtTokenProvider.getUsernameFromJWT(token);
+                // load user associated with token
+                UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            // set spring security
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // set spring security
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
         }
         filterChain.doFilter(request, response);
-
     }
 
     // Bearer <accessToken>

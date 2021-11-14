@@ -1,5 +1,7 @@
 package com.example.apossbackend.config;
 
+import com.example.apossbackend.ApossBackendApplication;
+import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.security.CustomerDetailsService;
 import com.example.apossbackend.security.JwtAuthenticationEntryPoint;
 import com.example.apossbackend.security.JwtAuthenticationFilter;
@@ -23,7 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     @Autowired
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
@@ -34,7 +35,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomerDetailsService customerDetailsService;
-
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -53,7 +53,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/industry/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/industryImage/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/kind/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/auth/**").permitAll()
                 .anyRequest()
                 .authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -19,5 +19,4 @@ public class ApossBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(ApossBackendApplication.class, args);
     }
-
 }

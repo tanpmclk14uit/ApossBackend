@@ -30,22 +30,19 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO findUserInformationByToken(String token) {
-        if(StringUtils.hasText(token) && tokenProvider.validateToken(token)){
-            String username = tokenProvider.getUsernameFromJWT(token);
-            CustomerEntity customer = customerRepository.findByEmail(username).orElseThrow(
-                    () ->new ApossBackendException(HttpStatus.BAD_REQUEST, "User not found"));
-            return  mapToCustomerDTO(customer);
-        }else{
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "User not found");
+    public CustomerDTO findUserInformationById(long id, String token) {
+        if(tokenProvider.validateToken(token)){
+            String userName = tokenProvider.getUsernameFromJWT(token);
+            CustomerEntity customer = customerRepository.findByEmail(userName).orElseThrow(
+                    ()-> new ResourceNotFoundException("Customer", "email", id));
+            if(customer.getId()==id){
+               return mapToCustomerDTO(customer);
+            }else{
+                throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid authentication");
+            }
+        }else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Access token error");
         }
-    }
-
-    @Override
-    public CustomerDTO findUserInformationById(long id) {
-        CustomerEntity customer = customerRepository.findById(id).orElseThrow(
-                () ->new ResourceNotFoundException("Customer", "id", id));
-        return mapToCustomerDTO(customer);
     }
     private CustomerDTO mapToCustomerDTO(CustomerEntity customerEntity) {
         return modelMapper.map(customerEntity, CustomerDTO.class);
