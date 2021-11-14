@@ -13,7 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,27 @@ public class ProductServiceImpl implements ProductService {
         Page<ProductEntity> productsPage = productRepository.findAll(pageable);
         List<ProductEntity> productEntityList = productsPage.getContent();
         List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect(Collectors.toList());
+        ProductsResponse productsResponse = new ProductsResponse();
+        productsResponse.setContent(content);
+        productsResponse.setLast(productsPage.isLast());
+        productsResponse.setTotalElements(productsPage.getTotalElements());
+        productsResponse.setPageNo(productsPage.getNumber());
+        productsResponse.setPageSize(productsPage.getSize());
+        productsResponse.setTotalPages(productsPage.getTotalPages());
+        return productsResponse;
+    }
+
+    @Override
+    public ProductsResponse getAllProductByKeyword(String keyword,int pageNo, int pageSize, String sortBy, String sortDir) {
+        //Sort
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        //Pageable
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize,sort);
+        System.out.println(keyword);
+        Page<ProductEntity> productsPage = productRepository.findAllByNameContains(keyword,pageable);
+        List<ProductEntity> productEntityList = productsPage.getContent();
+        List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect( Collectors.toList());
         ProductsResponse productsResponse = new ProductsResponse();
         productsResponse.setContent(content);
         productsResponse.setLast(productsPage.isLast());

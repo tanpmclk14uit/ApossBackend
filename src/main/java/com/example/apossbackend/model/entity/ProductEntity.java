@@ -34,4 +34,7 @@ public class ProductEntity extends BaseEntity{
 
     @Column(nullable = false)
     private float rating;
+
+    @Column(nullable = false)
+    private int purchased;
 }

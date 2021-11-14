@@ -13,6 +13,7 @@ public class ProductDTO {
     private String name;
     private int price;
     private float rating;
+    private int purchased;
     private boolean isFavorite;
 }
 
