@@ -30,4 +30,9 @@ public class ProvinceEntity {
     )
     private List<DistrictEntity> districts = new ArrayList<>();
 
+    @Column
+    private  String type;
+
+    @Column
+    private  String slug;
 }

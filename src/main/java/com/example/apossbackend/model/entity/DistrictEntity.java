@@ -24,7 +24,7 @@ public class DistrictEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "province")
+    @JoinColumn(nullable = false, name = "province", referencedColumnName = "id")
     private ProvinceEntity province;
 
     @OneToMany(
@@ -33,4 +33,7 @@ public class DistrictEntity {
             orphanRemoval = true
     )
     private List<WardEntity> wards = new ArrayList<>();
+
+    @Column
+    private  String type;
 }

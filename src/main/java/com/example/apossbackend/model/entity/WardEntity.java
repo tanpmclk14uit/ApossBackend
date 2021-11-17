@@ -22,6 +22,9 @@ public class WardEntity{
     private String name;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "district")
+    @JoinColumn(nullable = false, name = "district",referencedColumnName = "id")
     private DistrictEntity district;
+
+    @Column
+    private  String type;
 }
