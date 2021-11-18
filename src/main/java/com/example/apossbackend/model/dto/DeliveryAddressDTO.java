@@ -12,9 +12,9 @@ public class DeliveryAddressDTO {
     private String name;
     private Boolean gender;
     private String phoneNumber;
-    private String province;
-    private String district;
-    private String ward;
+    private ProvinceDTO province;
+    private DistrictDTO district;
+    private WardDTO ward;
     private String addressLane;
     private Boolean isDefault;
 }
