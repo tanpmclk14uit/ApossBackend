@@ -31,16 +31,7 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize,sort);
 
         Page<ProductEntity> productsPage = productRepository.findAll(pageable);
-        List<ProductEntity> productEntityList = productsPage.getContent();
-        List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect(Collectors.toList());
-        ProductsResponse productsResponse = new ProductsResponse();
-        productsResponse.setContent(content);
-        productsResponse.setLast(productsPage.isLast());
-        productsResponse.setTotalElements(productsPage.getTotalElements());
-        productsResponse.setPageNo(productsPage.getNumber());
-        productsResponse.setPageSize(productsPage.getSize());
-        productsResponse.setTotalPages(productsPage.getTotalPages());
-        return productsResponse;
+        return getProductsResponse(productsPage);
     }
 
     @Override
@@ -52,6 +43,10 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize,sort);
         System.out.println(keyword);
         Page<ProductEntity> productsPage = productRepository.findAllByNameContains(keyword,pageable);
+        return getProductsResponse(productsPage);
+    }
+
+    private ProductsResponse getProductsResponse(Page<ProductEntity> productsPage) {
         List<ProductEntity> productEntityList = productsPage.getContent();
         List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect( Collectors.toList());
         ProductsResponse productsResponse = new ProductsResponse();

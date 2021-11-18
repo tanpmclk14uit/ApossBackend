@@ -28,16 +28,16 @@ public class CustomerServiceImpl implements CustomerService {
         this.modelMapper = modelMapper;
         this.tokenProvider = tokenProvider;
     }
+
     @Override
     public CustomerDTO findUserInformationByEmail(String email, String token) {
-        tokenProvider.validateToken(token);
         String userName= tokenProvider.getUsernameFromJWT(token);
         CustomerEntity customer = customerRepository.findByEmail(userName).orElseThrow(
                 ()-> new ResourceNotFoundException("Customer", "email", userName));
         if(customer.getEmail().equals(email)){
             return mapToCustomerDTO(customer);
         }else{
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid authentication");
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
     }
 
