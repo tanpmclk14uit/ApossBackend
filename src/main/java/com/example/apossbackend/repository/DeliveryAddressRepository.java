@@ -1,11 +1,9 @@
 package com.example.apossbackend.repository;
 
-import com.example.apossbackend.model.entity.ProvinceEntity;
+import com.example.apossbackend.model.entity.DeliveryAddressEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ProvinceRepository extends JpaRepository<ProvinceEntity, Long> {
+public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddressEntity, Long> {
 }
