@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -88,5 +90,13 @@ public class JwtTokenProvider  {
         } catch (IllegalArgumentException ex) {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "JWT claims string is empty.");
         }
+    }
+
+    public String getJWTFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7, bearerToken.length());
+        }
+        return null;
     }
 }

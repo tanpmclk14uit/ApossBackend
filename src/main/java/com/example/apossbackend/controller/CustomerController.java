@@ -7,22 +7,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("api/v1/customer")
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, JwtTokenProvider jwtTokenProvider) {
         this.customerService = customerService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
-
-   @GetMapping("/{email}")
+    @GetMapping("/{email}")
     public ResponseEntity<CustomerDTO> getCustomerByEmail(
-            @RequestBody String accessToken,
-            @PathVariable(name ="email") String email
+            @PathVariable(name ="email") String email,
+            HttpServletRequest request
    ){
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         return ResponseEntity.ok(customerService.findUserInformationByEmail(email, accessToken));
    }
 }
