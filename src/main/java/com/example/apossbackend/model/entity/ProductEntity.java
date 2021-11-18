@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -37,4 +38,7 @@ public class ProductEntity extends BaseEntity{
 
     @Column(nullable = false)
     private int purchased;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImageEntity> productImages;
 }

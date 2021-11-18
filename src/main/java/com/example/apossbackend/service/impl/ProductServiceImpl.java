@@ -3,6 +3,7 @@ package com.example.apossbackend.service.impl;
 import com.example.apossbackend.model.ProductsResponse;
 import com.example.apossbackend.model.dto.ProductDTO;
 import com.example.apossbackend.model.entity.ProductEntity;
+import com.example.apossbackend.repository.ProductImageRepository;
 import com.example.apossbackend.repository.ProductRepository;
 import com.example.apossbackend.service.ProductService;
 import org.modelmapper.ModelMapper;
@@ -12,11 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,18 +58,20 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
+    private final ProductImageRepository productImageRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper) {
-        super();
-        this.modelMapper = modelMapper;
+    public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper, ProductImageRepository productImageRepository) {
         this.productRepository = productRepository;
+        this.modelMapper = modelMapper;
+        this.productImageRepository = productImageRepository;
     }
 
     private ProductDTO mapToProductDTO(ProductEntity productEntity) {
-        ProductDTO product = new ProductDTO();
-        product = modelMapper.map(productEntity, ProductDTO.class);
-        product.setImage("https://s.yimg.com/os/creatr-uploaded-images/2020-11/c891d158-28a0-11eb-afc3-f454cc2e3b45");
+        ProductDTO product = modelMapper.map(productEntity, ProductDTO.class);
+        String imgURl = productImageRepository.findProductImageEntityByProductAndPriority(productEntity, 1).getImageUrl();
+        product.setImage(imgURl);
         return product;
     }
+
 }
