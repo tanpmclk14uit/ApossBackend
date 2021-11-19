@@ -32,7 +32,7 @@ public class OrderItemEntity extends BaseEntity {
     private String imageUrl;
 
     @Column(nullable = false)
-    private double prince;
+    private double price;
 
     @Column(nullable = false)
     private double quantity;

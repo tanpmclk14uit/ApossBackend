@@ -19,7 +19,6 @@ public class ProductEntity extends BaseEntity{
     @Column(nullable = false)
     private int quantity;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kind_id",
             referencedColumnName = "id",
@@ -41,4 +40,7 @@ public class ProductEntity extends BaseEntity{
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImageEntity> productImages;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RatingEntity> productRatings;
 }

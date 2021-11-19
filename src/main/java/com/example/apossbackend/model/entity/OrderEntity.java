@@ -30,7 +30,7 @@ public class OrderEntity extends BaseEntity {
     private Date receivedDate;
 
     @Column(nullable = false, name = "total_price")
-    private double totalPrice;
+    private int totalPrice;
 
     @Column(nullable = false, name = "delivery_address")
     private String deliveryAddress;

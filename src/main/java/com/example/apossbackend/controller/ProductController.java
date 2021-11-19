@@ -1,8 +1,11 @@
 package com.example.apossbackend.controller;
 
 import com.example.apossbackend.model.ProductsResponse;
+import com.example.apossbackend.model.dto.ProductDetailDTO;
+import com.example.apossbackend.model.dto.ProductImageDTO;
 import com.example.apossbackend.service.ProductService;
 import com.example.apossbackend.utils.AppConstants;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,4 +41,26 @@ public class ProductController {
         return productService.getAllProductByKeyword(keyword, pageNo, pageSize, sortBy,sortDir);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDetailDTO> getProductDetailById(
+            @PathVariable (value = "id") long id
+    ){
+        return ResponseEntity.ok(productService.getProductDetail(id));
+    }
+
+    @GetMapping("/kind/{id}")
+    public ProductsResponse getAllProductByKindId(
+            @PathVariable(value =  "id") long id,
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize
+    ){
+        return productService.getAllProductByKindId(id, pageNo, pageSize);
+    }
+
+    @GetMapping("/{id}/images")
+    public ResponseEntity<List<ProductImageDTO>> getAllProductImageByProductId(
+            @PathVariable(value = "id") long id
+    ){
+        return ResponseEntity.ok(productService.getAllProductImageByProductId(id));
+    }
 }
