@@ -31,4 +31,7 @@ public class CartEntity extends BaseEntity{
 
     @Column(nullable = false)
     private String property;
+
+    @Column(nullable = false)
+    private boolean isSelect;
 }

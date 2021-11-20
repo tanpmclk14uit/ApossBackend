@@ -34,7 +34,7 @@ public class CartController {
             @RequestBody CartDTO cartDTO) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         cartService.createNewCart(cartDTO, accessToken);
-        return ResponseEntity.ok("Create cart success");
+        return ResponseEntity.ok("\"Create cart success\"");
     }
     @GetMapping
     public ResponseEntity<List<CartDTO>> getAllCart(HttpServletRequest request){
@@ -49,7 +49,7 @@ public class CartController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         cartService.deleteCartEntityByIdAndToken(id, accessToken);
-        return ResponseEntity.ok("Delete cart success");
+        return ResponseEntity.ok("\"Delete cart success\"");
     }
 
     @PutMapping()
@@ -59,7 +59,7 @@ public class CartController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         cartService.updateCartEntityByIdAndToken(cartDTO, accessToken);
-        return ResponseEntity.ok("Update cart success");
+        return ResponseEntity.ok("\"Update cart success\"");
     }
 
 }

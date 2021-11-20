@@ -11,4 +11,5 @@ public class CartDTO {
     private String imageUrl;
     private String name;
     private int price;
+    private boolean isSelect;
 }

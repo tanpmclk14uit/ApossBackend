@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Service
 public class CartServiceImpl implements CartService {
 
-
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
@@ -59,7 +58,7 @@ public class CartServiceImpl implements CartService {
         );
         String userName = tokenProvider.getUsernameFromJWT(accessToken);
         if(cartEntity.getCustomer().getEmail().equals(userName)){
-            cartEntity.setProperty(cartDTO.getProperty());
+            cartEntity.setSelect(cartDTO.isSelect());
             cartEntity.setUpdateTime(new Timestamp(new Date().getTime()));
             cartEntity.setQuantity(cartDTO.getQuantity());
             cartRepository.save(cartEntity);
@@ -97,6 +96,7 @@ public class CartServiceImpl implements CartService {
         cartEntity.setProduct(productEntity);
         cartEntity.setQuantity(cartDTO.getQuantity());
         cartEntity.setProperty(cartDTO.getProperty());
+        cartEntity.setSelect(cartDTO.isSelect());
         return cartEntity;
     }
 
@@ -107,6 +107,7 @@ public class CartServiceImpl implements CartService {
         cartDTO.setProductId(productId);
         cartDTO.setProperty(cartEntity.getProperty());
         cartDTO.setQuantity(cartEntity.getQuantity());
+        cartDTO.setSelect(cartEntity.isSelect());
         ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Cart", "product id", productId )
         );
