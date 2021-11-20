@@ -43,8 +43,13 @@ public class AuthController {
         return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/access-token")
+    @PostMapping("/access-token")
     public ResponseEntity<String> getNewAccessToken(@RequestBody String refreshToken) {
+        System.out.println(refreshToken);
+        if (refreshToken.startsWith("\"") && refreshToken.endsWith("\""))
+        {
+            refreshToken = refreshToken.substring(1, refreshToken.length()-1);
+        }
         if(!tokenProvider.validateToken(refreshToken)){
             throw new ApossBackendException(HttpStatus.BAD_REQUEST,"Refresh token error");
         }
