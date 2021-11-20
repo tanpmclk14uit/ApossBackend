@@ -102,10 +102,17 @@ public class CartServiceImpl implements CartService {
 
     private CartDTO mapToCartDTO(CartEntity cartEntity) {
         CartDTO cartDTO = new CartDTO();
+        long productId = cartEntity.getProduct().getId();
         cartDTO.setId(cartEntity.getId());
-        cartDTO.setProductId(cartEntity.getProduct().getId());
+        cartDTO.setProductId(productId);
         cartDTO.setProperty(cartEntity.getProperty());
         cartDTO.setQuantity(cartEntity.getQuantity());
+        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Cart", "product id", productId )
+        );
+        cartDTO.setName(productEntity.getName());
+        cartDTO.setImageUrl(productEntity.getProductImages().get(0).getImageUrl());
+        cartDTO.setPrice(productEntity.getPrice());
         return cartDTO;
     }
 
