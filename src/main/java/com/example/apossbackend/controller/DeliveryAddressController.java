@@ -42,7 +42,7 @@ public class DeliveryAddressController {
     {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         deliveryAddressService.addNewDeliveryAddress(accessToken, deliveryAddressDTO);
-        return ResponseEntity.ok("Add new delivery address success !");
+        return ResponseEntity.ok("\"Add new delivery address success !\"");
     }
 
     @DeleteMapping("/{id}")
@@ -52,7 +52,7 @@ public class DeliveryAddressController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         deliveryAddressService.deleteDeliveryAddress(accessToken, deliveryAddressId);
-        return ResponseEntity.ok("Delete delivery address success !");
+        return ResponseEntity.ok("\"Delete delivery address success !\"");
     }
 
     @PutMapping()
@@ -62,6 +62,6 @@ public class DeliveryAddressController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         deliveryAddressService.updateDeliveryAddress(accessToken, deliveryAddressDTO);
-        return ResponseEntity.ok("Update delivery address success !");
+        return ResponseEntity.ok("\"Update delivery address success !\"");
     }
 }

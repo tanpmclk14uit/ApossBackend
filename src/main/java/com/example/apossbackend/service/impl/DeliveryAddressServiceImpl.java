@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +61,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         DeliveryAddressEntity deliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntityById(deliveryAddressId).orElseThrow(
                 () -> new ApossBackendException("Error", HttpStatus.BAD_REQUEST, "Not found delivery address")
         );
-        if (deliveryAddressEntity.getCustomer().getEmail() == email)
+        if (Objects.equals(deliveryAddressEntity.getCustomer().getEmail(), email))
         {
             deliveryAddressRepository.delete(deliveryAddressEntity);
         }
@@ -73,12 +76,13 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         DeliveryAddressEntity deliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntityById(deliveryAddressDTO.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Cart", "id", deliveryAddressDTO.getId())
         );
-        if (deliveryAddressEntity.getCustomer().getEmail() == email)
+        if (Objects.equals(deliveryAddressEntity.getCustomer().getEmail(), email))
         {
             deliveryAddressEntity.setAddressLane(deliveryAddressDTO.getAddressLane());
             deliveryAddressEntity.setGender(deliveryAddressDTO.getGender());
             deliveryAddressEntity.setPhoneNumber(deliveryAddressDTO.getPhoneNumber());
             deliveryAddressEntity.setReceiverName(deliveryAddressDTO.getName());
+            deliveryAddressEntity.setUpdateTime(new Timestamp(new Date().getTime()));
             deliveryAddressEntity.setIsDefault(deliveryAddressDTO.getIsDefault());
             deliveryAddressEntity.setDistrict(convertDistrictDTOToEntity(deliveryAddressDTO.getDistrict()));
             deliveryAddressEntity.setProvince(convertProvinceDTOToEntity(deliveryAddressDTO.getProvince()));
@@ -101,6 +105,8 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         deliveryAddressEntity.setGender(deliveryAddressDTO.getGender());
         deliveryAddressEntity.setPhoneNumber(deliveryAddressDTO.getPhoneNumber());
         deliveryAddressEntity.setReceiverName(deliveryAddressDTO.getName());
+        deliveryAddressEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        deliveryAddressEntity.setCreateTime(new Timestamp(new Date().getTime()));
         deliveryAddressEntity.setIsDefault(deliveryAddressDTO.getIsDefault());
         deliveryAddressEntity.setDistrict(convertDistrictDTOToEntity(deliveryAddressDTO.getDistrict()));
         deliveryAddressEntity.setProvince(convertProvinceDTOToEntity(deliveryAddressDTO.getProvince()));

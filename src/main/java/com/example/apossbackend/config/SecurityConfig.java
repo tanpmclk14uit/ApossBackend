@@ -60,11 +60,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/v1/auth/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/district/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/province/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/ward/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/ward/**").permitAll()
                 .anyRequest()
                 .authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
     }
 
     @Override
