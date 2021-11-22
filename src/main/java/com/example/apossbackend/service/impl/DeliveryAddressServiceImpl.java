@@ -87,6 +87,12 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             deliveryAddressEntity.setDistrict(convertDistrictDTOToEntity(deliveryAddressDTO.getDistrict()));
             deliveryAddressEntity.setProvince(convertProvinceDTOToEntity(deliveryAddressDTO.getProvince()));
             deliveryAddressEntity.setWard(convertWardDTOToEntity(deliveryAddressDTO.getWard()));
+            if (deliveryAddressDTO.getIsDefault())
+            {
+                DeliveryAddressEntity defaultAddress = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
+                defaultAddress.setIsDefault(false);
+                deliveryAddressRepository.save(defaultAddress);
+            }
             deliveryAddressRepository.save(deliveryAddressEntity);
         }
         else {
