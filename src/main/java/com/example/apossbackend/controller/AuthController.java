@@ -43,7 +43,7 @@ public class AuthController {
         return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/access-token")
+    @PostMapping("/access-token")
     public ResponseEntity<String> getNewAccessToken(@RequestBody String refreshToken) {
         if(refreshToken.startsWith("\"") && refreshToken.endsWith("\"")){
             refreshToken = refreshToken.substring(1, refreshToken.length()-1);
