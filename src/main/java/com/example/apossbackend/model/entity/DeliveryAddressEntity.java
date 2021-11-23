@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class DeliveryAddressEntity extends  BaseEntity{
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "customer")
+    @JoinColumn(nullable = false, name = "customer", referencedColumnName = "id")
     private CustomerEntity customer;
 
     @Column(name = "phone", nullable = false)
@@ -27,6 +27,9 @@ public class DeliveryAddressEntity extends  BaseEntity{
 
     @Column(nullable = false)
     private Boolean gender;
+
+    @Column(nullable = false)
+    private Boolean isDefault;
 
     @OneToOne
     @JoinColumn(nullable = false, name = "province")
@@ -42,7 +45,4 @@ public class DeliveryAddressEntity extends  BaseEntity{
 
     @Column(nullable = false, name = "address_lane")
     private String addressLane;
-
-    @Column(nullable = false, name="full_address")
-    private String fullAddress;
 }
