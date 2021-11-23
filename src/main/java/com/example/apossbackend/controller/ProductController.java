@@ -3,6 +3,8 @@ package com.example.apossbackend.controller;
 import com.example.apossbackend.model.ProductsResponse;
 import com.example.apossbackend.model.dto.ProductDetailDTO;
 import com.example.apossbackend.model.dto.ProductImageDTO;
+import com.example.apossbackend.model.dto.ProductPropertyDTO;
+import com.example.apossbackend.model.dto.ProductRatingDTO;
 import com.example.apossbackend.service.ProductService;
 import com.example.apossbackend.utils.AppConstants;
 import org.springframework.http.ResponseEntity;
@@ -63,4 +65,18 @@ public class ProductController {
     ){
         return ResponseEntity.ok(productService.getAllProductImageByProductId(id));
     }
+    @GetMapping("/{id}/ratings")
+    public ResponseEntity<List<ProductRatingDTO>> getAllProductRatingOfProductId(
+            @PathVariable(value = "id") long id
+    ){
+        return ResponseEntity.ok(productService.getAllProductRatingOfProductId(id));
+    }
+    @GetMapping("/{id}/properties")
+    public ResponseEntity<List<ProductPropertyDTO>> getAllProductPropertyById(
+            @PathVariable(value = "id") long id,
+            @RequestParam(value = "isColor", defaultValue = "false", required = false) boolean isColor
+    ){
+        return ResponseEntity.ok(productService.getAllPropertyOfProductId(id, isColor));
+    }
+
 }

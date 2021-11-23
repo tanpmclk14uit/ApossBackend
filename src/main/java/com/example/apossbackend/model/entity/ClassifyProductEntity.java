@@ -17,7 +17,7 @@ import javax.persistence.Table;
 @Table(name= "classify_product")
 public class ClassifyProductEntity extends BaseEntity{
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "property_color")
     private boolean propertyColor;
 
     @Column(nullable = false)

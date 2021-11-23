@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,4 +35,7 @@ public class RatingEntity extends BaseEntity{
 
     @Column(nullable = false)
     private String comment;
+
+    @OneToMany(mappedBy = "rating", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RatingImageEntity> ratingImages = new ArrayList<>();
 }
