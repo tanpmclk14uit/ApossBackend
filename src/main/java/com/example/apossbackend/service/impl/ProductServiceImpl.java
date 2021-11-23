@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,8 +119,6 @@ public class ProductServiceImpl implements ProductService {
     private final RatingRepository ratingRepository;
     private final ProductPropertyRepository productPropertyRepository;
 
-
-
     public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper, ProductImageRepository productImageRepository, RatingRepository ratingRepository, ProductPropertyRepository productPropertyRepository) {
         this.productRepository = productRepository;
         this.modelMapper = modelMapper;
@@ -129,11 +128,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductRatingDTO mapToProductRatingDTO(RatingEntity rating){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         ProductRatingDTO productRatingDTO = new ProductRatingDTO();
         productRatingDTO.setId(rating.getId());
-        productRatingDTO.setName(rating.getCustomer().getEmail());
+        productRatingDTO.setName(rating.getCustomer().getName());
         productRatingDTO.setRating(rating.getRating());
-        productRatingDTO.setTime(rating.getCreateTime());
+        productRatingDTO.setTime(simpleDateFormat.format(rating.getCreateTime()));
         productRatingDTO.setContent(rating.getComment());
         productRatingDTO.setImageAvatarURl(rating.getCustomer().getImage());
         productRatingDTO.setListImageURL(rating.getRatingImages().stream().map(RatingImageEntity::getImageUrl).collect(Collectors.toList()));
