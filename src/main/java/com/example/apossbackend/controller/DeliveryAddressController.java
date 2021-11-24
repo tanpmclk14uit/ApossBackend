@@ -34,7 +34,7 @@ public class DeliveryAddressController {
         return ResponseEntity.ok(deliveryAddressService.getAllDeliveryByCustomer(accessToken));
     }
 
-    @GetMapping
+    @GetMapping("/default")
     public ResponseEntity<DeliveryAddressDTO> getCurrentDefaultDeliveryAddressByCustomer(
             HttpServletRequest request
     )
