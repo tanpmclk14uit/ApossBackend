@@ -6,9 +6,7 @@ import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -32,5 +30,16 @@ public class OrderController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         return ResponseEntity.ok(orderService.findAllOrderByCustomerIdAndStatus(OrderStatus.Pending, accessToken));
+    }
+
+    @PostMapping
+    public ResponseEntity<String> addNewOrder(
+            @RequestBody OrderDTO orderDTO,
+            HttpServletRequest request
+    )
+    {
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        orderService.addNewOrder(accessToken, orderDTO);
+        return ResponseEntity.ok("\"Add new order success !\"");
     }
 }

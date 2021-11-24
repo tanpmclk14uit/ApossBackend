@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface DistrictRepository extends JpaRepository<DistrictEntity, Long> {
     public List<DistrictEntity> getDistrictEntityByProvince_Id(long province_id);
+    public DistrictEntity getDistrictEntityByNameAndProvince_Id(String name, long province_id);
 }

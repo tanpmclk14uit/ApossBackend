@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface OrderService {
     List<OrderDTO> findAllOrderByCustomerIdAndStatus(OrderStatus status, String accessToken);
+
+    void addNewOrder(String accessToken, OrderDTO orderDTO);
 }

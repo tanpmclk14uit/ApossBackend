@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface WardRepository extends JpaRepository<WardEntity, Long> {
     public List<WardEntity> getAllByDistrict_Id(long district_id);
+    public WardEntity getWardEntityByNameAndDistrict_Id(String name, long district_id);
 }

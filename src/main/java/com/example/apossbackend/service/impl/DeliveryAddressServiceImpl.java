@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,9 +90,12 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             deliveryAddressEntity.setWard(convertWardDTOToEntity(deliveryAddressDTO.getWard()));
             if (deliveryAddressDTO.getIsDefault())
             {
-                DeliveryAddressEntity defaultAddress = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
-                defaultAddress.setIsDefault(false);
-                deliveryAddressRepository.save(defaultAddress);
+                Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
+                if (optionalDeliveryAddressEntity.isPresent()) {
+                    DeliveryAddressEntity defaultAddress = optionalDeliveryAddressEntity.get();
+                    defaultAddress.setIsDefault(false);
+                    deliveryAddressRepository.save(defaultAddress);
+                }
             }
             deliveryAddressRepository.save(deliveryAddressEntity);
         }

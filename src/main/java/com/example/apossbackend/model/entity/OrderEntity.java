@@ -60,5 +60,4 @@ public class OrderEntity extends BaseEntity {
             orphanRemoval = true
     )
     private List<DeliveringStatusEntity> deliveryStatuses = new ArrayList<>();
-
 }
