@@ -28,6 +28,7 @@ public class OrderController {
     public ResponseEntity<List<OrderDTO>> getAllOrderByCustomerIdAndStatus(
             HttpServletRequest request
     ){
+        System.out.println("in it ok");
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         return ResponseEntity.ok(orderService.findAllOrderByCustomerIdAndStatus(OrderStatus.Pending, accessToken));
     }
@@ -38,6 +39,7 @@ public class OrderController {
             HttpServletRequest request
     )
     {
+        System.out.println("in it ok");
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.addNewOrder(accessToken, orderDTO);
         return ResponseEntity.ok("\"Add new order success !\"");

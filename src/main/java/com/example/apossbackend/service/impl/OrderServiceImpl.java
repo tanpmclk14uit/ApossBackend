@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,11 +33,13 @@ public class OrderServiceImpl implements OrderService {
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
     private final WardRepository wardRepository;
+    private final OrderItemRepository orderItemRepository;
 
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, ModelMapper modelMapper, JwtTokenProvider jwtTokenProvider, CustomerRepository customerRepository,
-                            ProvinceRepository provinceRepository, DistrictRepository districtRepository, WardRepository wardRepository) {
+                            ProvinceRepository provinceRepository, DistrictRepository districtRepository, WardRepository wardRepository,
+                            OrderItemRepository orderItemRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -43,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
         this.wardRepository = wardRepository;
         this.districtRepository = districtRepository;
         this.provinceRepository = provinceRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @Override
@@ -60,7 +65,12 @@ public class OrderServiceImpl implements OrderService {
         {
             CustomerEntity customer = customerOptional.get();
             OrderEntity orderEntity = mapToOrderEntity(orderDTO, customer);
+            List<OrderItemEntity> listOrderItemEntity =  orderDTO.getOrderItemDTOList().stream().map(this::mapToOrderItemEntity).collect(Collectors.toList());
+            for (OrderItemEntity orderItemEntity: listOrderItemEntity) {
+                orderItemEntity.setOrder(orderEntity);
+            }
             orderRepository.save(orderEntity);
+            orderItemRepository.saveAll(listOrderItemEntity);
         }
         else
         {
@@ -73,7 +83,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private  OrderItemEntity mapToOrderItemEntity(OrderItemDTO orderItemDTO){
-        return modelMapper.map(orderItemDTO, OrderItemEntity.class);
+        OrderItemEntity orderItemEntity = modelMapper.map(orderItemDTO, OrderItemEntity.class);
+        orderItemEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        orderItemEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        return orderItemEntity;
     }
     private OrderDTO mapToOrderDTO(OrderEntity orderEntity){
         OrderDTO orderDTO = new OrderDTO();
@@ -88,11 +101,12 @@ public class OrderServiceImpl implements OrderService {
         return orderDTO;
     }
 
-    protected OrderEntity mapToOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity)
+    private OrderEntity mapToOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity)
     {
         OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        orderEntity.setUpdateTime(new Timestamp(new Date().getTime()));
         orderEntity.setCustomer(customerEntity);
-        orderEntity.setItems(orderDTO.getOrderItemDTOList().stream().map(this::mapToOrderItemEntity).collect(Collectors.toList()));
         orderEntity.setDeliveryAddress(orderDTO.getAddress());
         orderEntity.setTotalPrice(orderDTO.getTotalPrice());
         orderEntity.setStatus(OrderStatus.Pending);
