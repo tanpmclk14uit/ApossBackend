@@ -19,6 +19,9 @@ public class ProductEntity extends BaseEntity{
     @Column(nullable = false)
     private int quantity;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int holdQuantity;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kind_id",
             referencedColumnName = "id",
