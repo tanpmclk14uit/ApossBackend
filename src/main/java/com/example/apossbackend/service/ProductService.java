@@ -24,4 +24,5 @@ public interface ProductService {
     List<ProductRatingDTO> getAllProductRatingOfProductId(long id);
 
     List<ProductPropertyDTO> getAllPropertyOfProductId(long id, boolean isColor);
+
 }

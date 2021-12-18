@@ -5,9 +5,13 @@ import com.example.apossbackend.model.entity.ProductImageEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +20,17 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     Page<ProductEntity> findAllByNameContains(String name, Pageable pageable);
 
     Page<ProductEntity> findProductEntityByKindId(long kindId, Pageable pageable);
+
+    ProductEntity findProductEntityById(long id);
+
+    @Transactional
+    @Modifying
+    @Query("update ProductEntity product set product.holdQuantity = :holdQuantity WHERE product.id = :productId")
+    void setProductHoldQuantity(@Param("productId") Long id, @Param("holdQuantity") int holdQuantity);
+
+    @Transactional
+    @Modifying
+    @Query("update ProductEntity product set product.quantity = :quantity WHERE product.id = :productId")
+    void setProductQuantity(@Param("productId") Long id, @Param("quantity") int quantity);
+
 }

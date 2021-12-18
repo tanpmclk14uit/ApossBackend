@@ -6,6 +6,7 @@ import com.example.apossbackend.model.dto.OrderItemDTO;
 import com.example.apossbackend.model.entity.CustomerEntity;
 import com.example.apossbackend.model.entity.OrderEntity;
 import com.example.apossbackend.model.entity.OrderItemEntity;
+import com.example.apossbackend.model.entity.ProductEntity;
 import com.example.apossbackend.repository.*;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.OrderService;
@@ -31,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final ProvinceRepository provinceRepository;
+    private final ProductRepository productRepository;
     private final DistrictRepository districtRepository;
     private final WardRepository wardRepository;
     private final OrderItemRepository orderItemRepository;
@@ -39,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, ModelMapper modelMapper, JwtTokenProvider jwtTokenProvider, CustomerRepository customerRepository,
                             ProvinceRepository provinceRepository, DistrictRepository districtRepository, WardRepository wardRepository,
-                            OrderItemRepository orderItemRepository) {
+                            OrderItemRepository orderItemRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -48,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
         this.districtRepository = districtRepository;
         this.provinceRepository = provinceRepository;
         this.orderItemRepository = orderItemRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -68,12 +71,55 @@ public class OrderServiceImpl implements OrderService {
             List<OrderItemEntity> listOrderItemEntity =  orderDTO.getOrderItemDTOList().stream().map(this::mapToOrderItemEntity).collect(Collectors.toList());
             for (OrderItemEntity orderItemEntity: listOrderItemEntity) {
                 orderItemEntity.setOrder(orderEntity);
+                ProductEntity product  = productRepository.findProductEntityById(orderItemEntity.getProduct());
+                productRepository.setProductQuantity(product.getId(), product.getQuantity()-orderItemEntity.getQuantity());
+                productRepository.setProductHoldQuantity(product.getId(), 0);
             }
             orderRepository.save(orderEntity);
             orderItemRepository.saveAll(listOrderItemEntity);
         }
         else
         {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
+    @Override
+    public void holdOrder(String accessToken, List<OrderItemDTO> listOrderItemDTO) {
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<CustomerEntity> customerOptional  = customerRepository.findByEmail(email);
+        if (customerOptional.isPresent())
+        {
+            for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
+                ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
+                int diffQuantity = referenceProduct.getQuantity() - referenceProduct.getHoldQuantity();
+                if (orderItemDTO.getQuantity() > diffQuantity)
+                {
+                    throw new ApossBackendException(HttpStatus.CHECKPOINT, "Not having enough product's quantity");
+                }
+            }
+            for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
+                ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
+                productRepository.setProductHoldQuantity(orderItemDTO.getProduct(), referenceProduct.getHoldQuantity() + orderItemDTO.getQuantity());
+            }
+        }
+        else  {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
+    @Override
+    public void reduceHold(String accessToken, List<OrderItemDTO> listOrderItemDTO) {
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<CustomerEntity> customerOptional  = customerRepository.findByEmail(email);
+        if (customerOptional.isPresent())
+        {
+            for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
+                ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
+                productRepository.setProductHoldQuantity(orderItemDTO.getProduct(), referenceProduct.getHoldQuantity() - orderItemDTO.getQuantity());
+            }
+        }
+        else  {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
     }

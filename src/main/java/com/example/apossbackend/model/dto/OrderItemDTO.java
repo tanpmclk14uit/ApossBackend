@@ -9,6 +9,6 @@ public class OrderItemDTO {
     private String imageUrl;
     private String name;
     private int price;
-    private int amount;
+    private int quantity;
     private String property;
 }

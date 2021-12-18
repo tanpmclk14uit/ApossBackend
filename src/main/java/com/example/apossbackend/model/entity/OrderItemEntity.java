@@ -32,5 +32,5 @@ public class OrderItemEntity extends BaseEntity {
     private double price;
 
     @Column(nullable = false)
-    private double quantity;
+    private int quantity;
 }

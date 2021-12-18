@@ -1,6 +1,7 @@
 package com.example.apossbackend.controller;
 
 import com.example.apossbackend.model.dto.OrderDTO;
+import com.example.apossbackend.model.dto.OrderItemDTO;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
@@ -39,9 +40,30 @@ public class OrderController {
             HttpServletRequest request
     )
     {
-        System.out.println("in it ok");
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.addNewOrder(accessToken, orderDTO);
         return ResponseEntity.ok("\"Add new order success !\"");
+    }
+
+    @PutMapping("/hold")
+    public ResponseEntity<String> holdProduct(
+            @RequestBody List<OrderItemDTO> listOrderItemDTO,
+            HttpServletRequest request
+    ){
+        System.out.println("hold service");
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        orderService.holdOrder(accessToken, listOrderItemDTO);
+        return ResponseEntity.ok("\"Hold success !\"");
+    }
+
+    @PutMapping("/reduceHold")
+    public ResponseEntity<String> reduceHold(
+            @RequestBody List<OrderItemDTO> listOrderItemDTO,
+            HttpServletRequest request
+    ){
+        System.out.println("hold service");
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        orderService.reduceHold(accessToken, listOrderItemDTO);
+        return ResponseEntity.ok("\"Hold success !\"");
     }
 }
