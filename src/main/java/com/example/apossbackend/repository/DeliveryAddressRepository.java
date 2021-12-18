@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddressEntity, Long> {
     List<DeliveryAddressEntity> findAllByCustomer_Email(String customer_email);
     Optional<DeliveryAddressEntity> findDeliveryAddressEntityById(long id);
-    DeliveryAddressEntity findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(String customer_email);
+    Optional<DeliveryAddressEntity> findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(String customer_email);
 }

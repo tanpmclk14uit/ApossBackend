@@ -10,6 +10,7 @@ import com.example.apossbackend.model.entity.*;
 import com.example.apossbackend.repository.*;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.DeliveryAddressService;
+import org.apache.tomcat.jni.Address;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +54,10 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     @Override
     public void addNewDeliveryAddress(String accessToken, DeliveryAddressDTO deliveryAddressDTO) {
         String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
+        if (optionalDeliveryAddressEntity.isEmpty()) {
+            deliveryAddressDTO.setIsDefault(true);
+        }
         deliveryAddressRepository.save(convertDeliveryAddressDTOToEntity(deliveryAddressDTO, email));
     }
 
@@ -89,15 +95,30 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             deliveryAddressEntity.setWard(convertWardDTOToEntity(deliveryAddressDTO.getWard()));
             if (deliveryAddressDTO.getIsDefault())
             {
-                DeliveryAddressEntity defaultAddress = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
-                defaultAddress.setIsDefault(false);
-                deliveryAddressRepository.save(defaultAddress);
+                Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
+                if (optionalDeliveryAddressEntity.isPresent()) {
+                    DeliveryAddressEntity defaultAddress = optionalDeliveryAddressEntity.get();
+                    defaultAddress.setIsDefault(false);
+                    deliveryAddressRepository.save(defaultAddress);
+                }
             }
             deliveryAddressRepository.save(deliveryAddressEntity);
         }
         else {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
+    }
+
+    @Override
+    public DeliveryAddressDTO getCurrentDefaultDeliveryAddressByCustomer(String accessToken) {
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
+        if (optionalDeliveryAddressEntity.isPresent()) {
+            DeliveryAddressEntity deliveryAddressEntity = optionalDeliveryAddressEntity.get();
+            DeliveryAddressDTO deliveryAddressDTO = convertDeliveryAddressFromEntityToDTO(deliveryAddressEntity);
+            return deliveryAddressDTO;
+        }
+        return null;
     }
 
     private DeliveryAddressEntity convertDeliveryAddressDTOToEntity(DeliveryAddressDTO deliveryAddressDTO, String email)

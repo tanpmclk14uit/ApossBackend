@@ -34,6 +34,15 @@ public class DeliveryAddressController {
         return ResponseEntity.ok(deliveryAddressService.getAllDeliveryByCustomer(accessToken));
     }
 
+    @GetMapping("/default")
+    public ResponseEntity<DeliveryAddressDTO> getCurrentDefaultDeliveryAddressByCustomer(
+            HttpServletRequest request
+    )
+    {
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        return ResponseEntity.ok(deliveryAddressService.getCurrentDefaultDeliveryAddressByCustomer(accessToken));
+    }
+
     @PostMapping
     public ResponseEntity<String> addNewDeliveryAddress(
             @RequestBody DeliveryAddressDTO deliveryAddressDTO,

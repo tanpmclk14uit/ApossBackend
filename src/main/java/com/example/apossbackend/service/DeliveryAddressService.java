@@ -12,4 +12,6 @@ public interface DeliveryAddressService {
     void deleteDeliveryAddress(String accessToken, Long deliveryAddressId);
 
     void updateDeliveryAddress(String accessToken, DeliveryAddressDTO deliveryAddressDTO);
+
+    DeliveryAddressDTO getCurrentDefaultDeliveryAddressByCustomer(String accessToken);
 }

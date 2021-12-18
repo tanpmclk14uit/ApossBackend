@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ProvinceRepository extends JpaRepository<ProvinceEntity, Long> {
+    public ProvinceEntity getAllByName(String name);
 }
