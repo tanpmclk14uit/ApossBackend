@@ -12,6 +12,7 @@ import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
 import io.jsonwebtoken.Jwt;
+import org.apache.catalina.Executor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,7 +104,9 @@ public class OrderServiceImpl implements OrderService {
             }
             for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
                 ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
-                productRepository.setProductHoldQuantity(orderItemDTO.getProduct(), referenceProduct.getHoldQuantity() + orderItemDTO.getQuantity());
+                System.out.println("product " + referenceProduct.getId() + ": " + referenceProduct.getHoldQuantity());
+                productRepository.setProductHoldQuantity(orderItemDTO.getProduct(),referenceProduct.getHoldQuantity()+orderItemDTO.getQuantity());
+                System.out.println("product " + productRepository.findProductEntityById(orderItemDTO.getProduct()).getId() + ": " + productRepository.findProductEntityById(orderItemDTO.getProduct()).getHoldQuantity());
             }
         }
         else  {
