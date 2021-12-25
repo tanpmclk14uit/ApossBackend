@@ -30,7 +30,7 @@ public class CustomerEntity extends BaseEntity{
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @Column()
@@ -42,6 +42,9 @@ public class CustomerEntity extends BaseEntity{
     @Column(name = "birth_day")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date birthDay;
+
+    @Column(name ="active", nullable = false)
+    private boolean isActive;
 
     @OneToMany(
             mappedBy = "customer",
@@ -56,5 +59,4 @@ public class CustomerEntity extends BaseEntity{
             orphanRemoval = true
     )
     private List<DeliveryAddressEntity> deliveryAddresses = new ArrayList<>();
-
 }

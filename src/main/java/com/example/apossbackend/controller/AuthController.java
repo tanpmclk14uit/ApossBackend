@@ -3,8 +3,11 @@ import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.model.dto.JWTAuthResponse;
 import com.example.apossbackend.model.dto.SignInDTO;
 import com.example.apossbackend.model.dto.SignUpDTO;
+import com.example.apossbackend.model.entity.ConfirmationToken;
+import com.example.apossbackend.model.entity.CustomerEntity;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.AuthService;
+import com.example.apossbackend.service.ConfirmationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +15,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final ConfirmationService confirmationService;
     private final JwtTokenProvider tokenProvider;
 
     @Autowired
-    public AuthController(AuthService authService, JwtTokenProvider tokenProvider) {
+    public AuthController(AuthService authService, ConfirmationService confirmationService, JwtTokenProvider tokenProvider) {
         this.authService = authService;
+        this.confirmationService = confirmationService;
         this.tokenProvider = tokenProvider;
     }
 
@@ -35,12 +43,23 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
+    @Transactional
     public ResponseEntity<String> registerCustomer(@RequestBody SignUpDTO signUpDTO) {
         if (authService.isEmailExist(signUpDTO.getEmail())) {
             return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
         }
-        authService.createCustomer(signUpDTO);
+        CustomerEntity customer = authService.createCustomer(signUpDTO);
+        confirmationService.createNewToken(customer);
         return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
+    }
+    @PostMapping("/confirm")
+    public ResponseEntity<String> validateCustomer(@RequestParam("token") String token){
+        ConfirmationToken confirmationToken = confirmationService.findByToken(token);
+        if(authService.updateActivatedByToken(confirmationToken)){
+            return new ResponseEntity<>("Confirm account success", HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>("Confirm account failure", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/access-token")
