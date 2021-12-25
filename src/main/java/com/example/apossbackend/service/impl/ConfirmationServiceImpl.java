@@ -29,7 +29,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     }
 
     @Override
-    public void createNewToken(CustomerEntity customer) {
+    public String createNewToken(CustomerEntity customer) {
         String token = UUID.randomUUID().toString();
         ConfirmationToken confirmationToken = new ConfirmationToken(
                 token,
@@ -38,5 +38,6 @@ public class ConfirmationServiceImpl implements ConfirmationService {
                 customer
         );
         confirmationRepository.save(confirmationToken);
+        return confirmationToken.getToken();
     }
 }

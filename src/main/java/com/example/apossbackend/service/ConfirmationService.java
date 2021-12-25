@@ -6,5 +6,5 @@ import com.example.apossbackend.model.entity.CustomerEntity;
 
 public interface ConfirmationService {
     public ConfirmationToken findByToken(String token);
-    public void createNewToken(CustomerEntity customer);
+    public String createNewToken(CustomerEntity customer);
 }
