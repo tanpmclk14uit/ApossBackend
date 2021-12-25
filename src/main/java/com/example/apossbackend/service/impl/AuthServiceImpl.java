@@ -4,6 +4,7 @@ import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.dto.SignUpDTO;
 import com.example.apossbackend.model.entity.CustomerEntity;
 import com.example.apossbackend.repository.CustomerRepository;
+import com.example.apossbackend.repository.SellerRepository;
 import com.example.apossbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,12 +22,15 @@ public class AuthServiceImpl implements AuthService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final SellerRepository sellerRepository;
 
     @Autowired
-    public AuthServiceImpl(CustomerRepository customerRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthServiceImpl(CustomerRepository customerRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+                           SellerRepository sellerRepository) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.sellerRepository = sellerRepository;
     }
 
     @Override
@@ -52,6 +56,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Authentication signIn(String email, String password) {
         if(!customerRepository.existsByEmail(email)){
+            throw new ResourceNotFoundException("Account","Email",email);
+        }
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                email, password));
+    }
+
+    @Override
+    public Authentication signInSeller(String email, String password) {
+        if(!sellerRepository.existsByEmail(email)){
             throw new ResourceNotFoundException("Account","Email",email);
         }
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(

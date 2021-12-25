@@ -57,4 +57,13 @@ public class AuthController {
         String token = tokenProvider.generateToken(authentication);
         return ResponseEntity.ok(token);
     }
+
+    @PostMapping("/seller-sign-in")
+    public ResponseEntity<JWTAuthResponse> authenticateSeller(@RequestBody SignInDTO signInDTO) {
+        Authentication authentication = authService.signInSeller(signInDTO.getEmail(), signInDTO.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = tokenProvider.generateToken(authentication);
+        String refreshToken = tokenProvider.generateRefreshToken(signInDTO.getEmail(), signInDTO.getPassword());
+        return ResponseEntity.ok(new JWTAuthResponse(token, refreshToken));
+    }
 }

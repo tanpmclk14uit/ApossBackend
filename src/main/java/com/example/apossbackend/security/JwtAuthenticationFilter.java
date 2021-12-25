@@ -25,6 +25,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomerDetailsService customerDetailsService;
 
+    @Autowired
+    private SellerDetailsService sellerDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -34,21 +37,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // validate token
         if (StringUtils.hasText(token)) {
             // get username from token
-            if (jwtTokenProvider.validateToken(token)) {
-                String username = jwtTokenProvider.getUsernameFromJWT(token);
-                // load user associated with token
-                UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
+            if (!token.startsWith("Seller ")) {
+                if (jwtTokenProvider.validateToken(token)) {
+                    String username = jwtTokenProvider.getUsernameFromJWT(token);
+                    // load user associated with token
+                    UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // set spring security
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // set spring security
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            }
+            else {
+                token = token.substring(7, token.length());
+                if (jwtTokenProvider.validateToken(token)) {
+                    String username = jwtTokenProvider.getUsernameFromJWT(token);
+                    // load user associated with token
+                    UserDetails userDetails = sellerDetailsService.loadUserByUsername(username);
+
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // set spring security
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
         }
         filterChain.doFilter(request, response);
     }
+
 
     // Bearer <accessToken>
     private String getJWTFromRequest(HttpServletRequest request) {

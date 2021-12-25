@@ -5,6 +5,7 @@ import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.security.CustomerDetailsService;
 import com.example.apossbackend.security.JwtAuthenticationEntryPoint;
 import com.example.apossbackend.security.JwtAuthenticationFilter;
+import com.example.apossbackend.security.SellerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomerDetailsService customerDetailsService;
+
+    @Autowired
+    private SellerDetailsService sellerDetailsService;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -69,6 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(customerDetailsService)
+                .passwordEncoder(passwordEncoder());
+        auth.userDetailsService(sellerDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
 
