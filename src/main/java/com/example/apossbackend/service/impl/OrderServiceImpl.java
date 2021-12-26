@@ -3,29 +3,20 @@ package com.example.apossbackend.service.impl;
 import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.model.dto.OrderDTO;
 import com.example.apossbackend.model.dto.OrderItemDTO;
-import com.example.apossbackend.model.entity.CustomerEntity;
-import com.example.apossbackend.model.entity.OrderEntity;
-import com.example.apossbackend.model.entity.OrderItemEntity;
-import com.example.apossbackend.model.entity.ProductEntity;
+import com.example.apossbackend.model.entity.*;
 import com.example.apossbackend.repository.*;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
-import io.jsonwebtoken.Jwt;
-import org.apache.catalina.Executor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,12 +31,13 @@ public class OrderServiceImpl implements OrderService {
     private final DistrictRepository districtRepository;
     private final WardRepository wardRepository;
     private final OrderItemRepository orderItemRepository;
+    private final SellerRepository sellerRepository;
 
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, ModelMapper modelMapper, JwtTokenProvider jwtTokenProvider, CustomerRepository customerRepository,
                             ProvinceRepository provinceRepository, DistrictRepository districtRepository, WardRepository wardRepository,
-                            OrderItemRepository orderItemRepository, ProductRepository productRepository) {
+                            OrderItemRepository orderItemRepository, ProductRepository productRepository, SellerRepository sellerRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -55,13 +47,21 @@ public class OrderServiceImpl implements OrderService {
         this.provinceRepository = provinceRepository;
         this.orderItemRepository = orderItemRepository;
         this.productRepository = productRepository;
+        this.sellerRepository =sellerRepository;
     }
 
     @Override
     public List<OrderDTO> findAllOrderByCustomerIdAndStatus(OrderStatus status, String accessToken) {
         String userName = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        List<OrderEntity> orderEntity = orderRepository.findOrderEntitiesByCustomerEmailAndStatus(userName, status);
-        return orderEntity.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
+        Optional<CustomerEntity> customerOptional = customerRepository.findByEmail(userName);
+        if (customerOptional.isPresent()) {
+            List<OrderEntity> orderEntity = orderRepository.findOrderEntitiesByCustomerEmailAndStatus(userName, status);
+            return orderEntity.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
+        }
+        else
+        {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
     }
 
     @Override
@@ -130,8 +130,90 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public OrderDTO findOrderByCustomerIdAndOrderId(long id, String accessToken) {
+        String userName = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<CustomerEntity> customerOptional = customerRepository.findByEmail(userName);
+        if (customerOptional.isPresent()) {
+            Optional<OrderEntity> optionalOrderEntity = orderRepository.getOrderEntityById(id);
+            if (optionalOrderEntity.isPresent()) {
+                OrderEntity orderEntity = optionalOrderEntity.get();
+                return mapToOrderDTO(orderEntity);
+            } else {
+                throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Order not exist!");
+            }
+        }
+        else
+        {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
+    @Override
+    public void cancelOrder(Long orderId, String cancelReason, String accessToken) {
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<CustomerEntity> customerEntityOptional = customerRepository.findByEmail(email);
+        if (customerEntityOptional.isPresent())
+        {
+            Optional<OrderEntity> optionalPendingOrderEntity = orderRepository.getOrderEntityByIdAndStatusAndCustomerEmail(orderId, OrderStatus.Pending, email);
+            if (optionalPendingOrderEntity.isPresent())
+            {
+                OrderEntity orderEntity = optionalPendingOrderEntity.get();
+                orderEntity.setCancelReason(cancelReason);
+                orderEntity.setStatus(OrderStatus.Cancel);
+                orderRepository.save(orderEntity);
+            }
+            else {
+                Optional<OrderEntity> optionalConfirmedOrderEntity = orderRepository.getOrderEntityByIdAndStatusAndCustomerEmail(orderId, OrderStatus.Confirmed, email);
+                if (optionalConfirmedOrderEntity.isPresent())
+                {
+                    OrderEntity orderEntity = optionalConfirmedOrderEntity.get();
+                    orderEntity.setCancelReason(cancelReason);
+                    orderEntity.setStatus(OrderStatus.Cancel);
+                    orderRepository.save(orderEntity);
+                }
+                else {
+                    throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+                }
+            }
+        }
+        else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
+    @Override
+    public void changeOrderStatus(long orderId, String accessToken, OrderStatus orderStatus) {
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<SellerEntity> sellerEntityOptional = sellerRepository.findByEmail(email);
+        if (sellerEntityOptional.isPresent())
+        {
+            Optional<OrderEntity> optionalConfirmedOrderEntity = orderRepository.getOrderEntityById(orderId);
+                if (optionalConfirmedOrderEntity.isPresent())
+                {
+                    OrderEntity orderEntity = optionalConfirmedOrderEntity.get();
+                    orderEntity.setStatus(orderStatus);
+                    orderRepository.save(orderEntity);
+                }
+                else {
+                    throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Order not exist!");
+                }
+        }
+        else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
     private OrderItemDTO mapToOrderItemDTO(OrderItemEntity orderItemEntity){
-        return modelMapper.map(orderItemEntity, OrderItemDTO.class);
+        OrderItemDTO orderItemDTO = new OrderItemDTO();
+        orderItemDTO.setId(orderItemEntity.getId());
+        orderItemDTO.setImageUrl(orderItemEntity.getImageUrl());
+        orderItemDTO.setName(orderItemEntity.getName());
+        orderItemDTO.setProduct(orderItemEntity.getProduct());
+        orderItemDTO.setPrice((int)orderItemEntity.getPrice());
+        orderItemDTO.setProperty(orderItemEntity.getProperty());
+        orderItemDTO.setQuantity(orderItemEntity.getQuantity());
+        return orderItemDTO;
     }
 
     private  OrderItemEntity mapToOrderItemEntity(OrderItemDTO orderItemDTO){
@@ -149,7 +231,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setTotalPrice(orderEntity.getTotalPrice());
         orderDTO.setCancelReason(orderEntity.getCancelReason());
         List<OrderItemDTO> orderItemDTOList = orderEntity.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList());
-        orderDTO.setOrderItemDTOList(orderItemDTOList.subList(0, 1));
+        orderDTO.setOrderItemDTOList(orderItemDTOList);
         return orderDTO;
     }
 

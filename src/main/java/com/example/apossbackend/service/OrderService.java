@@ -14,4 +14,10 @@ public interface OrderService {
     void holdOrder(String accessToken, List<OrderItemDTO> listOrderItemDTO);
 
     void reduceHold(String accessToken, List<OrderItemDTO> listOrderItemDTO);
+
+    OrderDTO findOrderByCustomerIdAndOrderId(long id, String accessToken);
+
+    void cancelOrder(Long orderId, String cancelReason, String accessToken);
+
+    void changeOrderStatus(long orderId, String accessToken, OrderStatus orderStatus);
 }

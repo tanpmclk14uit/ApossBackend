@@ -118,7 +118,14 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             DeliveryAddressDTO deliveryAddressDTO = convertDeliveryAddressFromEntityToDTO(deliveryAddressEntity);
             return deliveryAddressDTO;
         }
-        return null;
+        return new DeliveryAddressDTO(0L,
+                "",
+                true,
+                "",
+                new ProvinceDTO(0L, ""),
+                new DistrictDTO(0L, "", 0L),
+                new WardDTO(0L, "", 0L),
+                "", true);
     }
 
     private DeliveryAddressEntity convertDeliveryAddressDTOToEntity(DeliveryAddressDTO deliveryAddressDTO, String email)
