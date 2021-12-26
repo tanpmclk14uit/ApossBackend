@@ -20,4 +20,10 @@ public interface OrderService {
     void cancelOrder(Long orderId, String cancelReason, String accessToken);
 
     void changeOrderStatus(long orderId, String accessToken, OrderStatus orderStatus);
+
+    List<OrderDTO> findAllOrderByStatus(OrderStatus orderStatus, String accessToken);
+
+    int countAllOnPlaceOrder(String accessToken);
+
+    void cancelOrderSeller(long orderId, String cancelReason, String accessToken);
 }

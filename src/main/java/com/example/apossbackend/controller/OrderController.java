@@ -105,5 +105,33 @@ public class OrderController {
         orderService.changeOrderStatus(orderId, accessToken, orderStatus);
         return ResponseEntity.ok("\"Update cart success\"");
     }
+
+    @PostMapping("/order-by-status")
+    public ResponseEntity<List<OrderDTO>> getAllOrderByStatus(
+            @RequestBody OrderStatus orderStatus,
+            HttpServletRequest request
+    ){
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        return ResponseEntity.ok(orderService.findAllOrderByStatus(orderStatus, accessToken));
+    }
+
+    @PostMapping("/on-place-order")
+    public ResponseEntity<Integer> countAllOnPlaceOrder(
+            HttpServletRequest request
+    ){
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        return ResponseEntity.ok(orderService.countAllOnPlaceOrder(accessToken));
+    }
+
+    @PostMapping("/cancel-order-seller/{id}")
+    public ResponseEntity<String> cancelOrderSeller(
+            @PathVariable(value = "id") long orderId,
+            @RequestBody String cancelReason,
+            HttpServletRequest request
+    ){
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        orderService.cancelOrderSeller(orderId, cancelReason, accessToken);
+        return ResponseEntity.ok("\"Update cart success\"");
+    }
 }
 

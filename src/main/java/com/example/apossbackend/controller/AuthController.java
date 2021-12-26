@@ -52,7 +52,8 @@ public class AuthController {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST,"Refresh token error");
         }
         SignInDTO signInDTO = tokenProvider.getUserNamePasswordFromRefreshToken(refreshToken);
-        Authentication authentication = authService.signIn(signInDTO.getEmail(), signInDTO.getPassword());
+
+        Authentication authentication = refreshToken.startsWith("Bearer Seller ")?authService.signInSeller(signInDTO.getEmail(), signInDTO.getPassword()):authService.signIn(signInDTO.getEmail(), signInDTO.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
         return ResponseEntity.ok(token);

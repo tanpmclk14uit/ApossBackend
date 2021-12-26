@@ -15,5 +15,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
    Optional<OrderEntity> getOrderEntityById(long id);
 
    Optional<OrderEntity> getOrderEntityByIdAndStatusAndCustomerEmail(long id, OrderStatus status, String customer_email);
+   List<OrderEntity> findOrderEntitiesByStatus(OrderStatus status);
 
+   int countAllByStatus(OrderStatus status);
 }
