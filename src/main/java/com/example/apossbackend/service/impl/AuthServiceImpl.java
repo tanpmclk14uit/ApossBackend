@@ -2,6 +2,7 @@ package com.example.apossbackend.service.impl;
 
 import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.exception.ResourceNotFoundException;
+import com.example.apossbackend.model.dto.SignInWithSocialDTO;
 import com.example.apossbackend.model.dto.SignUpDTO;
 import com.example.apossbackend.model.entity.ConfirmationToken;
 import com.example.apossbackend.model.entity.CustomerEntity;
@@ -20,6 +21,7 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -84,5 +86,23 @@ public class AuthServiceImpl implements AuthService {
         customer.setActive(true);
         customerRepository.save(customer);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public void signInWithGoogle(SignInWithSocialDTO signInWithSocialDTO, String password) {
+        if(!customerRepository.existsByEmail(signInWithSocialDTO.getEmail())){
+            CustomerEntity customer = new CustomerEntity();
+            customer.setEmail(signInWithSocialDTO.getEmail());
+            customer.setPassword(passwordEncoder.encode(password));
+            customer.setName(signInWithSocialDTO.getName());
+            customer.setActive(true);
+            customer.setCreateTime(new Timestamp(new Date().getTime()));
+            customer.setUpdateTime(new Timestamp(new Date().getTime()));
+            if(!signInWithSocialDTO.getImageURL().equalsIgnoreCase("null")){
+                customer.setImage(signInWithSocialDTO.getImageURL());
+            }
+            customerRepository.save(customer);
+        }
     }
 }

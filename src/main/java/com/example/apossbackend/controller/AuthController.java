@@ -3,6 +3,7 @@ import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.dto.JWTAuthResponse;
 import com.example.apossbackend.model.dto.SignInDTO;
+import com.example.apossbackend.model.dto.SignInWithSocialDTO;
 import com.example.apossbackend.model.dto.SignUpDTO;
 import com.example.apossbackend.model.entity.ConfirmationToken;
 import com.example.apossbackend.model.entity.CustomerEntity;
@@ -44,9 +45,25 @@ public class AuthController {
     @PostMapping("/sign-in")
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody SignInDTO signInDTO) {
         Authentication authentication = authService.signIn(signInDTO.getEmail(), signInDTO.getPassword());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
         String refreshToken = tokenProvider.generateRefreshToken(signInDTO.getEmail(), signInDTO.getPassword());
+        return ResponseEntity.ok(new JWTAuthResponse(token, refreshToken));
+    }
+
+    @PostMapping("/sign-in-with-social-account")
+    public ResponseEntity<JWTAuthResponse> signInWithGoogle(@RequestBody SignInWithSocialDTO signInWithGoogle) {
+        if(!signInWithGoogle.getSecretKey().equals("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")){
+            throw  new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid google login!!");
+        }
+        String password = "";
+        if(authService.isEmailExist(signInWithGoogle.getEmail())){
+            password = customerService.findCustomerByEmail(signInWithGoogle.getEmail()).getPassword();
+        }else{
+            password = UUID.randomUUID().toString();
+        }
+        authService.signInWithGoogle(signInWithGoogle, password);
+        String token = tokenProvider.generateSocialAccountToken(signInWithGoogle.getEmail());
+        String refreshToken = tokenProvider.generateRefreshToken(signInWithGoogle.getEmail(), password);
         return ResponseEntity.ok(new JWTAuthResponse(token, refreshToken));
     }
 
