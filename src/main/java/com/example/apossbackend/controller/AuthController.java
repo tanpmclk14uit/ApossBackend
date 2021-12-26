@@ -1,5 +1,6 @@
 package com.example.apossbackend.controller;
 import com.example.apossbackend.exception.ApossBackendException;
+import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.dto.JWTAuthResponse;
 import com.example.apossbackend.model.dto.SignInDTO;
 import com.example.apossbackend.model.dto.SignUpDTO;
@@ -8,6 +9,7 @@ import com.example.apossbackend.model.entity.CustomerEntity;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.AuthService;
 import com.example.apossbackend.service.ConfirmationService;
+import com.example.apossbackend.service.CustomerService;
 import com.example.apossbackend.service.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,13 +29,15 @@ public class AuthController {
     private final ConfirmationService confirmationService;
     private final JwtTokenProvider tokenProvider;
     private final EmailSender emailSender;
+    private final CustomerService customerService;
 
     @Autowired
-    public AuthController(AuthService authService, ConfirmationService confirmationService, JwtTokenProvider tokenProvider, EmailSender emailSender) {
+    public AuthController(AuthService authService, ConfirmationService confirmationService, JwtTokenProvider tokenProvider, EmailSender emailSender, CustomerService customerService) {
         this.authService = authService;
         this.confirmationService = confirmationService;
         this.tokenProvider = tokenProvider;
         this.emailSender = emailSender;
+        this.customerService = customerService;
     }
 
 
@@ -50,14 +54,30 @@ public class AuthController {
     @Transactional
     public ResponseEntity<String> registerCustomer(@RequestBody SignUpDTO signUpDTO) {
         if (authService.isEmailExist(signUpDTO.getEmail())) {
-            return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Email was already taken!");
         }
         CustomerEntity customer = authService.createCustomer(signUpDTO);
         String token = confirmationService.createNewToken(customer);
         String link = "http://127.0.0.1:8081/api/v1/auth/confirm?token="+token;
         emailSender.send(customer.getEmail(), buildEmail(customer.getName(), link));
-        return new ResponseEntity<>("Waiting for confirm account!", HttpStatus.OK);
+        return new ResponseEntity<>("\"Waiting for confirm account!\"", HttpStatus.OK);
     }
+
+    @GetMapping("/resent-confirm")
+    public ResponseEntity<String> resentConfirmMail(@RequestParam("email") String email){
+        if(email.startsWith("\"") && email.endsWith("\"")){
+            email = email.substring(1, email.length()-1);
+        }
+        CustomerEntity customer = customerService.findCustomerByEmail(email);
+        if(customer.isActive()){
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Customer account was already activated");
+        }
+        String token = confirmationService.createNewToken(customer);
+        String link = "http://127.0.0.1:8081/api/v1/auth/confirm?token="+token;
+        emailSender.send(customer.getEmail(), buildEmail(customer.getName(), link));
+        return new ResponseEntity<>("\"Resent confirmation email success!\"", HttpStatus.OK);
+    }
+
     @GetMapping("/confirm")
     public ResponseEntity<String> validateCustomer(@RequestParam("token") String token){
         ConfirmationToken confirmationToken = confirmationService.findByToken(token);
@@ -67,6 +87,7 @@ public class AuthController {
             return new ResponseEntity<>("Confirm account failure!", HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @PostMapping("/access-token")
     public ResponseEntity<String> getNewAccessToken(@RequestBody String refreshToken) {
