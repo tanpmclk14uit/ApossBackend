@@ -26,6 +26,18 @@ public class JwtTokenProvider  {
 
     // generate token
 
+    public String generateSocialAccountToken(String email){
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + jwtExpirationInMs);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
     public String generateToken(Authentication authentication){
 
         String username = authentication.getName();

@@ -45,4 +45,10 @@ public class CustomerServiceImpl implements CustomerService {
         return modelMapper.map(customerEntity, CustomerDTO.class);
     }
 
+    @Override
+    public CustomerEntity findCustomerByEmail(String email) {
+        return customerRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("Customer account","email", email)
+        );
+    }
 }

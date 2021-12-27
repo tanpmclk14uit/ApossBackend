@@ -6,7 +6,9 @@ import org.springframework.security.core.Authentication;
 public interface AuthService {
 
     boolean isEmailExist(String email);
-    void createCustomer(SignUpDTO signUpDTO);
+    CustomerEntity createCustomer(SignUpDTO signUpDTO);
     Authentication signIn(String email, String password);
     Authentication signInSeller(String email, String password);
+    void signInWithGoogle(SignInWithSocialDTO signInWithSocialDTO, String password);
+    Boolean updateActivatedByToken(ConfirmationToken token);
 }
