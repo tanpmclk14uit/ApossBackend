@@ -32,6 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private final RatingRepository ratingRepository;
     private final ProductPropertyRepository productPropertyRepository;
     private final KindRepository kindRepository;
+    private final ClassifyProductRepository classifyProductRepository;
+    private final ClassifyProductValueRepository classifyProductValueRepository;
 
 
     private ProductRatingDTO mapToProductRatingDTO(RatingEntity rating){
@@ -237,5 +239,39 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProductImageById(Long id) {
         productImageRepository.deleteById(id);
+    }
+
+    @Override
+    public void createNewProductProperty(ProductPropertyDTO productPropertyDTO) {
+        ClassifyProductEntity classifyProductEntity = new ClassifyProductEntity();
+        classifyProductEntity.setName(productPropertyDTO.getName());
+        classifyProductEntity.setPropertyColor(productPropertyDTO.isColor());
+        classifyProductEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        classifyProductEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        classifyProductRepository.save(classifyProductEntity);
+    }
+
+    @Override
+    public void deleteProductPropertyById(long id) {
+        classifyProductRepository.deleteById(id);
+    }
+
+    @Override
+    public void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId) {
+        ClassifyProductValueEntity classifyProductValueEntity = new ClassifyProductValueEntity();
+        classifyProductValueEntity.setName(productPropertyValueDTO.getName());
+        classifyProductValueEntity.setValue(productPropertyValueDTO.getValue());
+        ClassifyProductEntity classifyProductEntity = classifyProductRepository.findById(propertyId).orElseThrow(
+                () -> new ResourceNotFoundException("Classify product","id", propertyId)
+        );
+        classifyProductValueEntity.setClassifyProduct(classifyProductEntity);
+        classifyProductValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        classifyProductValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        classifyProductValueRepository.save(classifyProductValueEntity);
+    }
+
+    @Override
+    public void deleteProductPropertyValueById(long id) {
+        classifyProductValueRepository.deleteById(id);
     }
 }

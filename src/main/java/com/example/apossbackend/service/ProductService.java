@@ -33,4 +33,10 @@ public interface ProductService {
     void updateProductImageById(NewProductImageDTO newImage, Long id);
 
     void deleteProductImageById(Long id);
+
+    void createNewProductProperty(ProductPropertyDTO productPropertyDTO);
+    void deleteProductPropertyById(long id);
+
+    void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId);
+    void deleteProductPropertyValueById(long id);
 }

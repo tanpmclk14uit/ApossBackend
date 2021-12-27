@@ -132,4 +132,41 @@ public class ProductController {
         productService.deleteProductById(id);
         return ResponseEntity.ok("Remove product success");
     }
+
+    @PostMapping("/property")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> createNewProperty(
+            @RequestBody ProductPropertyDTO productPropertyDTO
+    ){
+        productService.createNewProductProperty(productPropertyDTO);
+        return ResponseEntity.ok("Create new property success");
+    }
+    @DeleteMapping("/property/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteProperty(
+            @PathVariable("id") long id
+    ){
+        productService.deleteProductPropertyById(id);
+        return ResponseEntity.ok("Remove product property success");
+    }
+
+    @PostMapping("/property/{id}/value")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> createNewPropertyValue(
+            @RequestBody ProductPropertyValueDTO productPropertyValueDTO,
+            @PathVariable("id") long propertyId
+    ){
+        productService.createNewProductPropertyValue(productPropertyValueDTO,propertyId);
+        return ResponseEntity.ok("Create new property value success");
+    }
+
+    @DeleteMapping("/property/value/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deletePropertyValue(
+            @PathVariable("id") long id
+    ){
+        productService.deleteProductPropertyValueById(id);
+        return ResponseEntity.ok("Remove product property value success");
+    }
+
 }
