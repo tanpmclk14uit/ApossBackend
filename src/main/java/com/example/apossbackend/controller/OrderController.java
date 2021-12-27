@@ -6,6 +6,7 @@ import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +77,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findAllOrderByCustomerIdAndStatus(orderStatus, accessToken));
     }
 
-    @PostMapping("/order-by-id/{id}")
+    @GetMapping("/order-by-id/{id}")
     public ResponseEntity<OrderDTO> getAllOrderByCustomerAndStatus(
             @PathVariable(value = "id") long id,
             HttpServletRequest request
@@ -106,35 +107,33 @@ public class OrderController {
         return ResponseEntity.ok("\"Update cart success\"");
     }
 
-    @PostMapping("/change-order-status/{id}")
+    @PutMapping("/change-order-status/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> changeOrderStatus(
             @PathVariable(value = "id") long orderId,
-            @RequestBody OrderStatus orderStatus,
-            HttpServletRequest request
+            @RequestBody OrderStatus orderStatus
     ){
-        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
-        orderService.changeOrderStatus(orderId, accessToken, orderStatus);
+        orderService.changeOrderStatus(orderId, orderStatus);
         return ResponseEntity.ok("\"Update cart success\"");
     }
 
-    @PostMapping("/order-by-status")
+    @GetMapping("/order-by-status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDTO>> getAllOrderByStatus(
-            @RequestBody OrderStatus orderStatus,
-            HttpServletRequest request
+            @RequestParam("status") OrderStatus orderStatus
     ){
-        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
-        return ResponseEntity.ok(orderService.findAllOrderByStatus(orderStatus, accessToken));
+        List<OrderDTO> listOrder = orderService.findAllOrderByStatus(orderStatus);
+        System.out.println(listOrder.size());
+        return ResponseEntity.ok(listOrder);
     }
 
-    @PostMapping("/on-place-order")
-    public ResponseEntity<Integer> countAllOnPlaceOrder(
-            HttpServletRequest request
-    ){
-        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
-        return ResponseEntity.ok(orderService.countAllOnPlaceOrder(accessToken));
+    @GetMapping("/on-place-order")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> countAllOnPlaceOrder(){
+        return ResponseEntity.ok(orderService.countAllOnPlaceOrder());
     }
 
-    @GetMapping("/cancel-order-seller/{id}")
+    @PutMapping("/cancel-order-seller/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> cancelOrderSeller(
             @PathVariable(value = "id") long orderId,

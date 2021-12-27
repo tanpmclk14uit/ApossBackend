@@ -133,9 +133,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO findOrderByCustomerIdAndOrderId(long id, String accessToken) {
-        String userName = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<CustomerEntity> customerOptional = customerRepository.findByEmail(userName);
-        if (customerOptional.isPresent()) {
             Optional<OrderEntity> optionalOrderEntity = orderRepository.getOrderEntityById(id);
             if (optionalOrderEntity.isPresent()) {
                 OrderEntity orderEntity = optionalOrderEntity.get();
@@ -143,11 +140,6 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Order not exist!");
             }
-        }
-        else
-        {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
     }
 
     @Override
@@ -184,11 +176,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void changeOrderStatus(long orderId, String accessToken, OrderStatus orderStatus) {
-        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<SellerEntity> sellerEntityOptional = sellerRepository.findByEmail(email);
-        if (sellerEntityOptional.isPresent())
-        {
+    public void changeOrderStatus(long orderId, OrderStatus orderStatus) {
             Optional<OrderEntity> optionalConfirmedOrderEntity = orderRepository.getOrderEntityById(orderId);
                 if (optionalConfirmedOrderEntity.isPresent())
                 {
@@ -199,40 +187,20 @@ public class OrderServiceImpl implements OrderService {
                 else {
                     throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Order not exist!");
                 }
-        }
-        else {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
     }
 
     @Override
-    public List<OrderDTO> findAllOrderByStatus(OrderStatus orderStatus, String accessToken) {
-        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<SellerEntity> sellerEntityOptional  = sellerRepository.findByEmail(email);
-        if (sellerEntityOptional.isPresent())
-        {
+    public List<OrderDTO> findAllOrderByStatus(OrderStatus orderStatus) {
             List<OrderEntity> listOrderEntity = orderRepository.findOrderEntitiesByStatus(orderStatus);
             return listOrderEntity.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
-        }
-        else  {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
     }
 
     @Override
-    public int countAllOnPlaceOrder(String accessToken) {
-        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<SellerEntity> sellerEntityOptional  = sellerRepository.findByEmail(email);
-        if (sellerEntityOptional.isPresent())
-        {
+    public int countAllOnPlaceOrder() {
             int totalPending = orderRepository.countAllByStatus(OrderStatus.Pending);
             int totalConfirmed = orderRepository.countAllByStatus(OrderStatus.Confirmed);
             int totalDelivered = orderRepository.countAllByStatus(OrderStatus.Delivering);
             return totalConfirmed + totalDelivered + totalPending;
-        }
-        else  {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
     }
 
 
@@ -314,5 +282,25 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setDistrict(district);
         orderEntity.setWard(ward);
         return orderEntity;
+    }
+
+    private OrderStatus mapToOrderStatus(int statusInt)
+    {
+        if (statusInt == 0)
+        {
+            return OrderStatus.Pending;
+        } else  if (statusInt == 1)
+        {
+            return OrderStatus.Confirmed;
+        } else  if (statusInt == 2)
+        {
+            return OrderStatus.Delivering;
+        } else  if (statusInt == 3)
+        {
+            return OrderStatus.Success;
+        } else
+        {
+            return OrderStatus.Cancel;
+        }
     }
 }

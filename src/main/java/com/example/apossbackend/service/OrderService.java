@@ -19,13 +19,13 @@ public interface OrderService {
 
     void cancelOrder(Long orderId, String cancelReason, String accessToken);
 
-    void changeOrderStatus(long orderId, String accessToken, OrderStatus orderStatus);
+    void changeOrderStatus(long orderId, OrderStatus orderStatus);
 
-    List<OrderDTO> findAllOrderByStatus(OrderStatus orderStatus, String accessToken);
+    List<OrderDTO> findAllOrderByStatus(OrderStatus orderStatus);
 
-    int countAllOnPlaceOrder(String accessToken);
+    int countAllOnPlaceOrder();
 
-    void cancelOrderSeller(long orderId, String cancelReason, String accessToken);
+    void cancelOrderSeller(long orderId, String cancelReason);
 
     void makeSuccessOrder(long orderId, String accessToken);
 }

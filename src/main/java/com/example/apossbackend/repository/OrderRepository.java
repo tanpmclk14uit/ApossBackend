@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
    Optional<OrderEntity> getOrderEntityById(long id);
 
    Optional<OrderEntity> getOrderEntityByIdAndStatusAndCustomerEmail(long id, OrderStatus status, String customer_email);
+
    List<OrderEntity> findOrderEntitiesByStatus(OrderStatus status);
 
    int countAllByStatus(OrderStatus status);
