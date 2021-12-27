@@ -40,7 +40,6 @@ public class AuthController {
         this.customerService = customerService;
     }
 
-
     @PostMapping("/sign-in")
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody SignInDTO signInDTO) {
         Authentication authentication = authService.signIn(signInDTO.getEmail(), signInDTO.getPassword());
@@ -104,7 +103,6 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/access-token")
     public ResponseEntity<String> getNewAccessToken(@RequestBody String refreshToken) {
         if(refreshToken.startsWith("\"") && refreshToken.endsWith("\"")){
@@ -114,8 +112,22 @@ public class AuthController {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST,"Refresh token error");
         }
         SignInDTO signInDTO = tokenProvider.getUserNamePasswordFromRefreshToken(refreshToken);
+        Authentication authentication = authService.signIn(signInDTO.getEmail(), signInDTO.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = tokenProvider.generateToken(authentication);
+        return ResponseEntity.ok(token);
+    }
 
-        Authentication authentication = refreshToken.startsWith("Bearer Seller ")?authService.signInSeller(signInDTO.getEmail(), signInDTO.getPassword()):authService.signIn(signInDTO.getEmail(), signInDTO.getPassword());
+    @PostMapping("/seller-access-token")
+    public ResponseEntity<String> getNewSellerAccessToken(@RequestBody String refreshToken){
+        if(refreshToken.startsWith("\"") && refreshToken.endsWith("\"")){
+            refreshToken = refreshToken.substring(1, refreshToken.length()-1);
+        }
+        if(!tokenProvider.validateToken(refreshToken)){
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST,"Refresh token error");
+        }
+        SignInDTO signInDTO = tokenProvider.getUserNamePasswordFromRefreshToken(refreshToken);
+        Authentication authentication = authService.signInSeller(signInDTO.getEmail(), signInDTO.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
         return ResponseEntity.ok(token);

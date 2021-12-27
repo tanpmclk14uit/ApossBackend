@@ -107,15 +107,7 @@ public class JwtTokenProvider  {
     public String getJWTFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            String token = bearerToken.substring(7, bearerToken.length());
-            if (!token.startsWith("Seller "))
-            {
-                return token;
-            }
-            else
-            {
-                return token.substring(7, token.length());
-            }
+            return bearerToken.substring(7, bearerToken.length());
         }
         return null;
     }

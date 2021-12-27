@@ -35,37 +35,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // get JWT (token) from http request
         String token = getJWTFromRequest(request);
         // validate token
-        if (StringUtils.hasText(token)) {
+        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             // get username from token
-            if (!token.startsWith("Seller ")) {
-                if (jwtTokenProvider.validateToken(token)) {
-                    String username = jwtTokenProvider.getUsernameFromJWT(token);
-                    // load user associated with token
-                    UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
+            String username = jwtTokenProvider.getUsernameFromJWT(token);
+            // load user associated with token
+            UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities()
+            );
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            // set spring security
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    // set spring security
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            }
-            else {
-                token = token.substring(7, token.length());
-                if (jwtTokenProvider.validateToken(token)) {
-                    String username = jwtTokenProvider.getUsernameFromJWT(token);
-                    // load user associated with token
-                    UserDetails userDetails = sellerDetailsService.loadUserByUsername(username);
-
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    // set spring security
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            }
         }
         filterChain.doFilter(request, response);
     }

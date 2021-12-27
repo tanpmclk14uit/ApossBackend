@@ -7,6 +7,7 @@ import com.example.apossbackend.model.dto.ProductPropertyDTO;
 import com.example.apossbackend.model.dto.ProductRatingDTO;
 import com.example.apossbackend.service.ProductService;
 import com.example.apossbackend.utils.AppConstants;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ProductsResponse getAllPosts(
+    public ProductsResponse getAllProducts(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -33,7 +34,7 @@ public class ProductController {
         return productService.getAllProduct(pageNo, pageSize, sortBy,sortDir);
     }
     @GetMapping("/search")
-    public ProductsResponse getAllPostsByKeyword(
+    public ProductsResponse getAllProductsByKeyword(
             @RequestParam(value = "keyword", defaultValue = AppConstants.DEFAULT_KEYWORD, required = false) String keyword,
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
