@@ -39,4 +39,8 @@ public interface ProductService {
 
     void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId);
     void deleteProductPropertyValueById(long id);
+
+    void applyPropertyValueForProduct(ProductPropertyValueDTO productPropertyValueDTO, long productId);
+    void removePropertyValueOfProduct(long productPropertyId, long productId);
+    void updatePropertyValueForProduct(ProductPropertyValueDTO productPropertyValueDTO, long productId);
 }

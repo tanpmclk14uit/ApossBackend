@@ -1,5 +1,6 @@
 package com.example.apossbackend.service.impl;
 
+import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.ProductsResponse;
 import com.example.apossbackend.model.dto.*;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -36,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     private final ClassifyProductValueRepository classifyProductValueRepository;
 
 
-    private ProductRatingDTO mapToProductRatingDTO(RatingEntity rating){
+    private ProductRatingDTO mapToProductRatingDTO(RatingEntity rating) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         ProductRatingDTO productRatingDTO = new ProductRatingDTO();
         productRatingDTO.setId(rating.getId());
@@ -57,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
-    private ProductDetailDTO mapToProductDetailDTO(ProductEntity productEntity){
+    private ProductDetailDTO mapToProductDetailDTO(ProductEntity productEntity) {
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
         productDetailDTO.setName(productEntity.getName());
         productDetailDTO.setPrice(productEntity.getPrice());
@@ -71,10 +73,12 @@ public class ProductServiceImpl implements ProductService {
         productDetailDTO.setTotalReview(totalReview);
         return productDetailDTO;
     }
-    private ProductImageDTO mapToProductImageDTO(ProductImageEntity productImageEntity){
+
+    private ProductImageDTO mapToProductImageDTO(ProductImageEntity productImageEntity) {
         return modelMapper.map(productImageEntity, ProductImageDTO.class);
     }
-    private ProductPropertyValueDTO mapToProductPropertyValueDTO(ProductToClassifyProductValueEntity productValue){
+
+    private ProductPropertyValueDTO mapToProductPropertyValueDTO(ProductToClassifyProductValueEntity productValue) {
         ProductPropertyValueDTO productPropertyValueDTO = new ProductPropertyValueDTO();
         productPropertyValueDTO.setId(productValue.getId());
         productPropertyValueDTO.setName(productValue.getClassifyProductValue().getName());
@@ -83,26 +87,27 @@ public class ProductServiceImpl implements ProductService {
         productPropertyValueDTO.setValue(productValue.getClassifyProductValue().getValue());
         return productPropertyValueDTO;
     }
+
     @Override
     public ProductsResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
         //Sort
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         //Pageable
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize,sort);
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 
         Page<ProductEntity> productsPage = productRepository.findAll(pageable);
         return getProductsResponse(productsPage);
     }
 
     @Override
-    public ProductsResponse getAllProductByKeyword(String keyword,int pageNo, int pageSize, String sortBy, String sortDir) {
+    public ProductsResponse getAllProductByKeyword(String keyword, int pageNo, int pageSize, String sortBy, String sortDir) {
         //Sort
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         //Pageable
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize,sort);
-        Page<ProductEntity> productsPage = productRepository.findAllByNameContains(keyword,pageable);
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
+        Page<ProductEntity> productsPage = productRepository.findAllByNameContains(keyword, pageable);
         return getProductsResponse(productsPage);
     }
 
@@ -116,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductsResponse getProductsResponse(Page<ProductEntity> productsPage) {
         List<ProductEntity> productEntityList = productsPage.getContent();
-        List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect( Collectors.toList());
+        List<ProductDTO> content = productEntityList.stream().map(this::mapToProductDTO).collect(Collectors.toList());
         ProductsResponse productsResponse = new ProductsResponse();
         productsResponse.setContent(content);
         productsResponse.setLast(productsPage.isLast());
@@ -142,7 +147,7 @@ public class ProductServiceImpl implements ProductService {
         );
         Sort sort = Sort.by("priority").ascending();
         //Pageable
-        Pageable pageable = PageRequest.of(0, product.getProductImages().size(),sort);
+        Pageable pageable = PageRequest.of(0, product.getProductImages().size(), sort);
         Page<ProductImageEntity> productEntities = productImageRepository.findProductImageEntitiesByProductId(id, pageable);
         List<ProductImageEntity> productImageEntities = productEntities.getContent();
         return productImageEntities.stream().map(this::mapToProductImageDTO).collect(Collectors.toList());
@@ -158,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductPropertyDTO> getAllPropertyOfProductId(long id, boolean isColor) {
-        List<ProductPropertyDTO> productPropertyDTOS =productPropertyRepository.findProductPropertyIdByProductId(id, isColor);
+        List<ProductPropertyDTO> productPropertyDTOS = productPropertyRepository.findProductPropertyIdByProductId(id, isColor);
         List<ProductToClassifyProductValueEntity> productToClassifyProductValueEntities = productPropertyRepository.findProductToClassifyProductValueEntitiesByProductId(id);
         for (ProductPropertyDTO productPropertyDTO : productPropertyDTOS) {
             ArrayList<ProductPropertyValueDTO> productPropertyValueDTOS = new ArrayList<>();
@@ -180,7 +185,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(newProductDTO.getDescription());
         product.setQuantity(newProductDTO.getQuantity());
         KindEntity kind = kindRepository.findById(newProductDTO.getKindId()).orElseThrow(
-                () -> new ResourceNotFoundException("Kind","Id", newProductDTO.getKindId())
+                () -> new ResourceNotFoundException("Kind", "Id", newProductDTO.getKindId())
         );
         product.setKind(kind);
         product.setCreateTime(new Timestamp(new Date().getTime()));
@@ -198,12 +203,13 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantity(newProductDTO.getQuantity());
         product.setDescription(newProductDTO.getDescription());
         KindEntity kind = kindRepository.findById(newProductDTO.getKindId()).orElseThrow(
-                () -> new ResourceNotFoundException("Kind","Id", newProductDTO.getKindId())
+                () -> new ResourceNotFoundException("Kind", "Id", newProductDTO.getKindId())
         );
         product.setKind(kind);
         product.setUpdateTime(new Timestamp(new Date().getTime()));
         productRepository.save(product);
     }
+
     @Override
     public void deleteProductById(Long id) {
         ProductEntity product = productRepository.findById(id).orElseThrow(
@@ -262,7 +268,7 @@ public class ProductServiceImpl implements ProductService {
         classifyProductValueEntity.setName(productPropertyValueDTO.getName());
         classifyProductValueEntity.setValue(productPropertyValueDTO.getValue());
         ClassifyProductEntity classifyProductEntity = classifyProductRepository.findById(propertyId).orElseThrow(
-                () -> new ResourceNotFoundException("Classify product","id", propertyId)
+                () -> new ResourceNotFoundException("Classify product", "id", propertyId)
         );
         classifyProductValueEntity.setClassifyProduct(classifyProductEntity);
         classifyProductValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
@@ -273,5 +279,46 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProductPropertyValueById(long id) {
         classifyProductValueRepository.deleteById(id);
+    }
+
+    @Override
+    public void applyPropertyValueForProduct(ProductPropertyValueDTO productPropertyValueDTO, long productId) {
+        if(productPropertyRepository.existsByProductIdAndClassifyProductValueId(productId, productPropertyValueDTO.getId())){
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Property already existed");
+        }
+        ProductToClassifyProductValueEntity productToClassifyProductValueEntity = new ProductToClassifyProductValueEntity();
+        ProductEntity product = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "Id", productId)
+        );
+        ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(productPropertyValueDTO.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Property value", "id", productPropertyValueDTO.getId())
+        );
+        productToClassifyProductValueEntity.setProduct(product);
+        productToClassifyProductValueEntity.setClassifyProductValue(classifyProductValueEntity);
+        productToClassifyProductValueEntity.setQuantity(productPropertyValueDTO.getQuantity());
+        productToClassifyProductValueEntity.setAdditionalPrice(productPropertyValueDTO.getAdditionalPrice());
+        productToClassifyProductValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        productToClassifyProductValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        productPropertyRepository.save(productToClassifyProductValueEntity);
+    }
+
+
+    @Override
+    public void updatePropertyValueForProduct(ProductPropertyValueDTO productPropertyValueDTO, long productId) {
+        ProductToClassifyProductValueEntity productToClassifyProductValueEntity = productPropertyRepository.findByProductIdAndClassifyProductValueId(productId, productPropertyValueDTO.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Product property value", " ", " ")
+        );
+        productToClassifyProductValueEntity.setQuantity(productPropertyValueDTO.getQuantity());
+        productToClassifyProductValueEntity.setAdditionalPrice(productPropertyValueDTO.getAdditionalPrice());
+        productToClassifyProductValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        productPropertyRepository.save(productToClassifyProductValueEntity);
+    }
+
+    @Override
+    public void removePropertyValueOfProduct(long productPropertyId, long productId) {
+        ProductToClassifyProductValueEntity productToClassifyProductValueEntity = productPropertyRepository.findByProductIdAndClassifyProductValueId(productId, productPropertyId).orElseThrow(
+                () -> new ResourceNotFoundException("Product property value", " ", " ")
+        );
+        productPropertyRepository.delete(productToClassifyProductValueEntity);
     }
 }

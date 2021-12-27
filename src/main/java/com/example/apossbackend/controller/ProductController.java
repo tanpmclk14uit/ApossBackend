@@ -168,5 +168,35 @@ public class ProductController {
         productService.deleteProductPropertyValueById(id);
         return ResponseEntity.ok("Remove product property value success");
     }
+    @PostMapping("/{id}/property-value")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> applyPropertyValueForProduct(
+            @RequestBody ProductPropertyValueDTO productPropertyValueDTO,
+            @PathVariable("id") long productId
+    ){
+        productService.applyPropertyValueForProduct(productPropertyValueDTO, productId);
+        return ResponseEntity.ok("Apply property value for product success");
+    }
+
+    @PutMapping("/{id}/property-value")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> editPropertyValueForProduct(
+            @RequestBody ProductPropertyValueDTO productPropertyValueDTO,
+            @PathVariable("id") long productId
+    ){
+        productService.updatePropertyValueForProduct(productPropertyValueDTO, productId);
+        return ResponseEntity.ok("Update property value for product success");
+    }
+    @DeleteMapping("/{id}/property-value/{valueId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deletePropertyValue(
+            @PathVariable("id") long productId,
+            @PathVariable("valueId") long valueId
+    ){
+        productService.removePropertyValueOfProduct(valueId, productId);
+        return ResponseEntity.ok("Remove product property value success");
+    }
+
+
 
 }

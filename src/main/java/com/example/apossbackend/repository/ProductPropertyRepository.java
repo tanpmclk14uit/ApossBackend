@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductPropertyRepository extends JpaRepository<ProductToClassifyProductValueEntity, Long> {
 
@@ -21,4 +22,7 @@ public interface ProductPropertyRepository extends JpaRepository<ProductToClassi
             "and pp.propertyColor = :isColor")
     List<ProductPropertyDTO> findProductPropertyIdByProductId(@Param("id") long id, @Param("isColor") boolean isColor);
 
+    Optional<ProductToClassifyProductValueEntity> findByProductIdAndClassifyProductValueId(long product_id, long classifyProductValue_id);
+
+    Boolean existsByProductIdAndClassifyProductValueId(long product_id, long classifyProductValue_id);
 }
