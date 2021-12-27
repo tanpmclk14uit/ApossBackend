@@ -124,7 +124,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.countAllOnPlaceOrder(accessToken));
     }
 
-    @GetMapping("/cancel-order-seller/{id}")
+    @PutMapping("/cancel-order-seller/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> cancelOrderSeller(
             @PathVariable(value = "id") long orderId,

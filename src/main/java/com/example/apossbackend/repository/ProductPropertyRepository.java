@@ -21,5 +21,4 @@ public interface ProductPropertyRepository extends JpaRepository<ProductToClassi
             "and pp.propertyColor = :isColor")
     List<ProductPropertyDTO> findProductPropertyIdByProductId(@Param("id") long id, @Param("isColor") boolean isColor);
 
-
 }
