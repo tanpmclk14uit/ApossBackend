@@ -43,7 +43,7 @@ public class CustomerEntity extends BaseEntity{
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date birthDay;
 
-    @Column(name ="active", nullable = false)
+    @Column(name ="active", nullable = false, columnDefinition = "bit(1) default 0")
     private boolean isActive;
 
     @OneToMany(

@@ -2,6 +2,7 @@ package com.example.apossbackend.controller;
 import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.model.dto.JWTAuthResponse;
 import com.example.apossbackend.model.dto.SignInDTO;
+import com.example.apossbackend.model.dto.SignInWithSocialDTO;
 import com.example.apossbackend.model.dto.SignUpDTO;
 import com.example.apossbackend.model.entity.ConfirmationToken;
 import com.example.apossbackend.model.entity.CustomerEntity;

@@ -1,6 +1,9 @@
 package com.example.apossbackend.service;
 
+import com.example.apossbackend.model.dto.SignInWithSocialDTO;
 import com.example.apossbackend.model.dto.SignUpDTO;
+import com.example.apossbackend.model.entity.ConfirmationToken;
+import com.example.apossbackend.model.entity.CustomerEntity;
 import org.springframework.security.core.Authentication;
 
 public interface AuthService {

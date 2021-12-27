@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     public AuthServiceImpl(CustomerRepository customerRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                           SellerRepository sellerRepository) {
+                           SellerRepository sellerRepository, ConfirmationRepository confirmationRepository) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
