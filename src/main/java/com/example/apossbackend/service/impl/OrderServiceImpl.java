@@ -1,6 +1,7 @@
 package com.example.apossbackend.service.impl;
 
 import com.example.apossbackend.exception.ApossBackendException;
+import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.dto.OrderDTO;
 import com.example.apossbackend.model.dto.OrderItemDTO;
 import com.example.apossbackend.model.entity.*;
@@ -234,27 +235,15 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+
     @Override
-    public void cancelOrderSeller(long orderId, String cancelReason, String accessToken) {
-        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<SellerEntity> sellerEntityOptional = sellerRepository.findByEmail(email);
-        if (sellerEntityOptional.isPresent())
-        {
-            Optional<OrderEntity> orderEntityOptional = orderRepository.getOrderEntityById(orderId);
-            if (orderEntityOptional.isPresent())
-            {
-                OrderEntity orderEntity = orderEntityOptional.get();
-                orderEntity.setCancelReason(cancelReason);
-                orderEntity.setStatus(OrderStatus.Cancel);
-                orderRepository.save(orderEntity);
-            }
-            else {
-                throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Order doesn't exist");
-            }
-        }
-        else {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
+    public void cancelOrderSeller(long orderId, String cancelReason) {
+        OrderEntity orderEntity = orderRepository.getOrderEntityById(orderId).orElseThrow(
+                ()-> new ResourceNotFoundException("Order", "Id", orderId)
+        );
+        orderEntity.setCancelReason(cancelReason);
+        orderEntity.setStatus(OrderStatus.Cancel);
+        orderRepository.save(orderEntity);
     }
 
     @Override

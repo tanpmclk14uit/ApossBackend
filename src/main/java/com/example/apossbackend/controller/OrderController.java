@@ -7,6 +7,7 @@ import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -133,14 +134,13 @@ public class OrderController {
         return ResponseEntity.ok(orderService.countAllOnPlaceOrder(accessToken));
     }
 
-    @PostMapping("/cancel-order-seller/{id}")
+    @GetMapping("/cancel-order-seller/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> cancelOrderSeller(
             @PathVariable(value = "id") long orderId,
-            @RequestBody String cancelReason,
-            HttpServletRequest request
+            @RequestBody String cancelReason
     ){
-        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
-        orderService.cancelOrderSeller(orderId, cancelReason, accessToken);
+        orderService.cancelOrderSeller(orderId, cancelReason);
         return ResponseEntity.ok("\"Update cart success\"");
     }
 
