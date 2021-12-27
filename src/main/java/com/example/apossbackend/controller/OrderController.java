@@ -95,6 +95,16 @@ public class OrderController {
         return ResponseEntity.ok("\"Update cart success\"");
     }
 
+    @PostMapping("/success-order-customer/{id}")
+    public ResponseEntity<String> makeSuccessOrder(
+            @PathVariable(value = "id") long orderId,
+            HttpServletRequest request
+    ){
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        orderService.makeSuccessOrder(orderId, accessToken);
+        return ResponseEntity.ok("\"Update cart success\"");
+    }
+
     @PostMapping("/change-order-status/{id}")
     public ResponseEntity<String> changeOrderStatus(
             @PathVariable(value = "id") long orderId,
@@ -133,5 +143,7 @@ public class OrderController {
         orderService.cancelOrderSeller(orderId, cancelReason, accessToken);
         return ResponseEntity.ok("\"Update cart success\"");
     }
+
+
 }
 

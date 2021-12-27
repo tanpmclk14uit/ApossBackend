@@ -26,4 +26,6 @@ public interface OrderService {
     int countAllOnPlaceOrder(String accessToken);
 
     void cancelOrderSeller(long orderId, String cancelReason, String accessToken);
+
+    void makeSuccessOrder(long orderId, String accessToken);
 }

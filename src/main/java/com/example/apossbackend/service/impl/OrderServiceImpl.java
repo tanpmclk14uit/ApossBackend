@@ -257,6 +257,26 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public void makeSuccessOrder(long orderId, String accessToken) {
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        Optional<CustomerEntity> customerEntityOptional = customerRepository.findByEmail(email);
+        if (customerEntityOptional.isPresent())
+        {
+            Optional<OrderEntity> optionalPendingOrderEntity = orderRepository.getOrderEntityByIdAndStatusAndCustomerEmail(orderId, OrderStatus.Delivering, email);
+            if (optionalPendingOrderEntity.isPresent())
+            {
+                OrderEntity orderEntity = optionalPendingOrderEntity.get();
+                orderEntity.setStatus(OrderStatus.Success);
+                orderRepository.save(orderEntity);
+            } else {
+                    throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+                }
+        } else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
     private OrderItemDTO mapToOrderItemDTO(OrderItemEntity orderItemEntity){
         OrderItemDTO orderItemDTO = new OrderItemDTO();
         orderItemDTO.setId(orderItemEntity.getId());
