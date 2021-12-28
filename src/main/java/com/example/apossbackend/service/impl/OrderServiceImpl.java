@@ -90,11 +90,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void holdOrder(String accessToken, List<OrderItemDTO> listOrderItemDTO) {
-        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<CustomerEntity> customerOptional  = customerRepository.findByEmail(email);
-        if (customerOptional.isPresent())
-        {
+    public void holdOrder(List<OrderItemDTO> listOrderItemDTO) {
             for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
                 ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
                 int diffQuantity = referenceProduct.getQuantity() - referenceProduct.getHoldQuantity();
@@ -109,26 +105,14 @@ public class OrderServiceImpl implements OrderService {
                 productRepository.setProductHoldQuantity(orderItemDTO.getProduct(),referenceProduct.getHoldQuantity()+orderItemDTO.getQuantity());
                 System.out.println("product " + productRepository.findProductEntityById(orderItemDTO.getProduct()).getId() + ": " + productRepository.findProductEntityById(orderItemDTO.getProduct()).getHoldQuantity());
             }
-        }
-        else  {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
     }
 
     @Override
-    public void reduceHold(String accessToken, List<OrderItemDTO> listOrderItemDTO) {
-        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
-        Optional<CustomerEntity> customerOptional  = customerRepository.findByEmail(email);
-        if (customerOptional.isPresent())
-        {
+    public void reduceHold(List<OrderItemDTO> listOrderItemDTO) {
             for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
                 ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
                 productRepository.setProductHoldQuantity(orderItemDTO.getProduct(), referenceProduct.getHoldQuantity() - orderItemDTO.getQuantity());
             }
-        }
-        else  {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
-        }
     }
 
     @Override

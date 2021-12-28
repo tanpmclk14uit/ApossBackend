@@ -48,29 +48,23 @@ public class OrderController {
 
     @PutMapping("/hold")
     public ResponseEntity<String> holdProduct(
-            @RequestBody List<OrderItemDTO> listOrderItemDTO,
-            HttpServletRequest request
+            @RequestBody List<OrderItemDTO> listOrderItemDTO
     ){
-        System.out.println("hold service");
-        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
-        orderService.holdOrder(accessToken, listOrderItemDTO);
+        orderService.holdOrder(listOrderItemDTO);
         return ResponseEntity.ok("\"Hold success !\"");
     }
 
     @PutMapping("/reduceHold")
     public ResponseEntity<String> reduceHold(
-            @RequestBody List<OrderItemDTO> listOrderItemDTO,
-            HttpServletRequest request
+            @RequestBody List<OrderItemDTO> listOrderItemDTO
     ){
-        System.out.println("hold service");
-        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
-        orderService.reduceHold(accessToken, listOrderItemDTO);
+        orderService.reduceHold(listOrderItemDTO);
         return ResponseEntity.ok("\"Hold success !\"");
     }
 
-    @PostMapping("/all-order-by")
+    @GetMapping("/all-order-by")
     public ResponseEntity<List<OrderDTO>> getAllOrderByCustomerAndStatus(
-            @RequestBody OrderStatus orderStatus,
+            @RequestParam("status") OrderStatus orderStatus,
             HttpServletRequest request
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
@@ -86,7 +80,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findOrderByCustomerIdAndOrderId(id, accessToken));
     }
 
-    @PostMapping("/cancel-order-customer/{id}")
+    @PutMapping("/cancel-order-customer/{id}")
     public ResponseEntity<String> cancelOrder(
             @PathVariable(value = "id") long orderId,
             @RequestBody String cancelReason,
@@ -97,7 +91,7 @@ public class OrderController {
         return ResponseEntity.ok("\"Update cart success\"");
     }
 
-    @PostMapping("/success-order-customer/{id}")
+    @PutMapping("/success-order-customer/{id}")
     public ResponseEntity<String> makeSuccessOrder(
             @PathVariable(value = "id") long orderId,
             HttpServletRequest request
