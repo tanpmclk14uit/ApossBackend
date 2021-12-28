@@ -96,7 +96,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             if (deliveryAddressDTO.getIsDefault())
             {
                 Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
-                if (optionalDeliveryAddressEntity.isPresent()) {
+                if (optionalDeliveryAddressEntity.isPresent() && optionalDeliveryAddressEntity.get().getId() != deliveryAddressDTO.getId()) {
                     DeliveryAddressEntity defaultAddress = optionalDeliveryAddressEntity.get();
                     defaultAddress.setIsDefault(false);
                     deliveryAddressRepository.save(defaultAddress);
