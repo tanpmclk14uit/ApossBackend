@@ -20,6 +20,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     Page<ProductEntity> findAllByNameContains(String name, Pageable pageable);
+    Page<ProductEntity> getProductEntitiesByNameContaining(String name, Pageable pageable);
 
     Page<ProductEntity> findProductEntityByKindId(long kindId, Pageable pageable);
 
