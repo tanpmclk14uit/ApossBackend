@@ -32,5 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 
-### Dockerfile ###
-dockerfile
+.github/workflows/maven.yml
