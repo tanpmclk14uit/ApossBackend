@@ -47,6 +47,6 @@ jobs:
           sudo -s
           docker container stop aposs_be
           docker container rm -f aposs_be
-          docker images rm -f aposs_be
+          docker image rm -f aposs_be
           docker build -t aposs_be .
           docker run -dp 8081:8081 --name aposs_be aposs_be
