@@ -42,7 +42,8 @@ jobs:
         port: 22
         script: | 
           sudo docker container stop aposs-be
-          sudo docker container rm -f aposs-be
+          docker container rm -f aposs-be
+          docker images rm -f aposs-be
           cd ~/ApossBackend 
           rm -rf build/*
           git pull origin master
