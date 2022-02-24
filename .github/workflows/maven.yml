@@ -42,12 +42,11 @@ jobs:
         password: ${{ secrets.SSH_PWD }}
         port: 22
         script: | 
-          sudo docker container stop aposs-be
-          docker container rm aposs-be -f
-          docker images rm aposs-be -f
           cd ~/ApossBackend 
           git pull origin master
-          sudo docker build . -t aposs-be
-          docker run -d -p 8081:8081 --name aposs_be aposs-be
-
-  #         rm -rf build/*
+          sudo -s
+          docker container stop aposs_be
+          docker container rm -f aposs_be
+          docker images rm -f aposs_be
+          docker build . -t aposs_be
+          docker run -d -p 8081:8081 --name aposs_be aposs_be
