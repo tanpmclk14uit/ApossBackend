@@ -31,8 +31,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}      
           password: ${{ secrets.SSH_PWD }}
           port: 22
-          source: "target/ApossBackend-0.0.1-SNAPSHOT.jar"      
+          source: "ApossBackend-0.0.1-SNAPSHOT.jar"      
           target: "~/ApossBackend/build"
+          rm: true
     - name: Deploy with docker
       uses: appleboy/ssh-action@master
       with:
@@ -45,7 +46,8 @@ jobs:
           docker container rm -f aposs-be
           docker images rm -f aposs-be
           cd ~/ApossBackend 
-          rm -rf build/*
           git pull origin master
-          sudo docker build -t aposs-be
-          sudo docker run -d -p 8081:8081 -t aposs-be --name aposs-be
+          sudo docker build . -t aposs-be
+          docker run -d -p 8081:8081 --name aposs_be aposs-be
+
+  #         rm -rf build/*
