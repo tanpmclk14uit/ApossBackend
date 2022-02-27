@@ -34,3 +34,6 @@ build/
 
 ### Mysql setup with docker, use this: https://hub.docker.com/_/mysql  ###
 stack.yml
+
+### Application properties ###
+src/main/resources/application.properties
