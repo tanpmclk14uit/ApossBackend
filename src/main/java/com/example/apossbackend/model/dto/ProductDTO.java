@@ -14,6 +14,5 @@ public class ProductDTO {
     private int price;
     private float rating;
     private int purchased;
-    private boolean isFavorite;
 }
 
