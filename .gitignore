@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Mysql setup with docker, use this: https://hub.docker.com/_/mysql  ###
+stack.yml
