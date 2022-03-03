@@ -15,8 +15,4 @@ public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress
     List<DeliveryAddressEntity> findAllByCustomer_Email(String customer_email);
     Optional<DeliveryAddressEntity> findDeliveryAddressEntityById(long id);
     Optional<DeliveryAddressEntity> findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(String customer_email);
-
-    @Modifying
-    @Query("UPDATE DeliveryAddressEntity ad SET ad.isDefault = false where ad.customer.email = :customer_email")
-    void resetDefaultAddress(@Param("customer_email") String customerEmail);
 }
