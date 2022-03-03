@@ -34,8 +34,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
 
     @Autowired
     public DeliveryAddressServiceImpl(DeliveryAddressRepository deliveryAddressRepository, JwtTokenProvider jwtTokenProvider, DistrictRepository districtRepository,
-                                      WardRepository wardRepository, ProvinceRepository provinceRepository, CustomerRepository customerRepository)
-    {
+                                      WardRepository wardRepository, ProvinceRepository provinceRepository, CustomerRepository customerRepository) {
         this.deliveryAddressRepository = deliveryAddressRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.customerRepository = customerRepository;
@@ -57,6 +56,10 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
         if (optionalDeliveryAddressEntity.isEmpty()) {
             deliveryAddressDTO.setIsDefault(true);
+        } else {
+            DeliveryAddressEntity defaultAddress = optionalDeliveryAddressEntity.get();
+            defaultAddress.setIsDefault(false);
+            deliveryAddressRepository.save(defaultAddress);
         }
         deliveryAddressRepository.save(convertDeliveryAddressDTOToEntity(deliveryAddressDTO, email));
     }
@@ -67,11 +70,9 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         DeliveryAddressEntity deliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntityById(deliveryAddressId).orElseThrow(
                 () -> new ApossBackendException("Error", HttpStatus.BAD_REQUEST, "Not found delivery address")
         );
-        if (Objects.equals(deliveryAddressEntity.getCustomer().getEmail(), email))
-        {
+        if (Objects.equals(deliveryAddressEntity.getCustomer().getEmail(), email)) {
             deliveryAddressRepository.delete(deliveryAddressEntity);
-        }
-        else {
+        } else {
             throw new ApossBackendException("Error", HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
     }
@@ -82,8 +83,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         DeliveryAddressEntity deliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntityById(deliveryAddressDTO.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Cart", "id", deliveryAddressDTO.getId())
         );
-        if (Objects.equals(deliveryAddressEntity.getCustomer().getEmail(), email))
-        {
+        if (Objects.equals(deliveryAddressEntity.getCustomer().getEmail(), email)) {
             deliveryAddressEntity.setAddressLane(deliveryAddressDTO.getAddressLane());
             deliveryAddressEntity.setGender(deliveryAddressDTO.getGender());
             deliveryAddressEntity.setPhoneNumber(deliveryAddressDTO.getPhoneNumber());
@@ -93,8 +93,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             deliveryAddressEntity.setDistrict(convertDistrictDTOToEntity(deliveryAddressDTO.getDistrict()));
             deliveryAddressEntity.setProvince(convertProvinceDTOToEntity(deliveryAddressDTO.getProvince()));
             deliveryAddressEntity.setWard(convertWardDTOToEntity(deliveryAddressDTO.getWard()));
-            if (deliveryAddressDTO.getIsDefault())
-            {
+            if (deliveryAddressDTO.getIsDefault()) {
                 Optional<DeliveryAddressEntity> optionalDeliveryAddressEntity = deliveryAddressRepository.findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(email);
                 if (optionalDeliveryAddressEntity.isPresent() && optionalDeliveryAddressEntity.get().getId() != deliveryAddressDTO.getId()) {
                     DeliveryAddressEntity defaultAddress = optionalDeliveryAddressEntity.get();
@@ -103,8 +102,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
                 }
             }
             deliveryAddressRepository.save(deliveryAddressEntity);
-        }
-        else {
+        } else {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
     }
@@ -128,8 +126,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
                 "", true);
     }
 
-    private DeliveryAddressEntity convertDeliveryAddressDTOToEntity(DeliveryAddressDTO deliveryAddressDTO, String email)
-    {
+    private DeliveryAddressEntity convertDeliveryAddressDTOToEntity(DeliveryAddressDTO deliveryAddressDTO, String email) {
         DeliveryAddressEntity deliveryAddressEntity = new DeliveryAddressEntity();
         CustomerEntity customerEntity = customerRepository.findByEmail(email).orElseThrow(
                 () -> new ApossBackendException("Error", HttpStatus.BAD_REQUEST, "Not found customer")
@@ -148,42 +145,35 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         return deliveryAddressEntity;
     }
 
-    public DeliveryAddressDTO convertDeliveryAddressFromEntityToDTO(DeliveryAddressEntity deliveryAddressEntity)
-    {
+    public DeliveryAddressDTO convertDeliveryAddressFromEntityToDTO(DeliveryAddressEntity deliveryAddressEntity) {
         return new DeliveryAddressDTO(deliveryAddressEntity.getId(), deliveryAddressEntity.getReceiverName(),
                 deliveryAddressEntity.getGender(), deliveryAddressEntity.getPhoneNumber(), convertProvinceEntityToDTO(deliveryAddressEntity.getProvince()),
                 convertDistrictEntityToDTO(deliveryAddressEntity.getDistrict()), convertWardEntityToDTO(deliveryAddressEntity.getWard()),
                 deliveryAddressEntity.getAddressLane(), deliveryAddressEntity.getIsDefault());
     }
 
-    private DistrictDTO convertDistrictEntityToDTO(DistrictEntity districtEntity)
-    {
+    private DistrictDTO convertDistrictEntityToDTO(DistrictEntity districtEntity) {
         return new DistrictDTO(districtEntity.getId(), districtEntity.getName(), districtEntity.getProvince().getId());
     }
 
-    private DistrictEntity convertDistrictDTOToEntity(DistrictDTO districtDTO)
-    {
+    private DistrictEntity convertDistrictDTOToEntity(DistrictDTO districtDTO) {
         return districtRepository.getById(districtDTO.getId());
     }
 
-    private WardEntity convertWardDTOToEntity(WardDTO wardDTO)
-    {
+    private WardEntity convertWardDTOToEntity(WardDTO wardDTO) {
         return wardRepository.getById(wardDTO.getId());
     }
 
-    private ProvinceEntity convertProvinceDTOToEntity(ProvinceDTO provinceDTO)
-    {
+    private ProvinceEntity convertProvinceDTOToEntity(ProvinceDTO provinceDTO) {
         return provinceRepository.getById(provinceDTO.getId());
     }
 
 
-    private ProvinceDTO convertProvinceEntityToDTO(ProvinceEntity provinceEntity)
-    {
+    private ProvinceDTO convertProvinceEntityToDTO(ProvinceEntity provinceEntity) {
         return new ProvinceDTO(provinceEntity.getId(), provinceEntity.getName());
     }
 
-    public WardDTO convertWardEntityToDTO(WardEntity wardEntity)
-    {
+    public WardDTO convertWardEntityToDTO(WardEntity wardEntity) {
         return new WardDTO(wardEntity.getId(), wardEntity.getName(), wardEntity.getDistrict().getId());
     }
 }
