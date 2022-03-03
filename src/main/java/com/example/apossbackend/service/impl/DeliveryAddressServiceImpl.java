@@ -58,6 +58,9 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
         if (optionalDeliveryAddressEntity.isEmpty()) {
             deliveryAddressDTO.setIsDefault(true);
         }
+        if(deliveryAddressDTO.getIsDefault()){
+            deliveryAddressRepository.resetDefaultAddress();
+        }
         deliveryAddressRepository.save(convertDeliveryAddressDTOToEntity(deliveryAddressDTO, email));
     }
 
