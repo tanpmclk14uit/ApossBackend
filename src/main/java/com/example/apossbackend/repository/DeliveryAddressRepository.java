@@ -4,6 +4,7 @@ import com.example.apossbackend.model.entity.DeliveryAddressEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,8 @@ public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress
     List<DeliveryAddressEntity> findAllByCustomer_Email(String customer_email);
     Optional<DeliveryAddressEntity> findDeliveryAddressEntityById(long id);
     Optional<DeliveryAddressEntity> findDeliveryAddressEntitiesByIsDefaultIsTrueAndCustomer_Email(String customer_email);
+
     @Modifying
-    @Query("UPDATE DeliveryAddressEntity ad SET ad.isDefault = false")
-    void resetDefaultAddress();
+    @Query("UPDATE DeliveryAddressEntity ad SET ad.isDefault = false where ad.customer.email = :customer_email")
+    void resetDefaultAddress(@Param("customer_email") String customerEmail);
 }

@@ -59,7 +59,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
             deliveryAddressDTO.setIsDefault(true);
         }
         if(deliveryAddressDTO.getIsDefault()){
-            deliveryAddressRepository.resetDefaultAddress();
+            deliveryAddressRepository.resetDefaultAddress(email);
         }
         deliveryAddressRepository.save(convertDeliveryAddressDTOToEntity(deliveryAddressDTO, email));
     }
