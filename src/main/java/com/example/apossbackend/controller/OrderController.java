@@ -46,21 +46,6 @@ public class OrderController {
         return ResponseEntity.ok("\"Add new order success !\"");
     }
 
-    @PutMapping("/hold")
-    public ResponseEntity<String> holdProduct(
-            @RequestBody List<OrderItemDTO> listOrderItemDTO
-    ){
-        orderService.holdOrder(listOrderItemDTO);
-        return ResponseEntity.ok("\"Hold success !\"");
-    }
-
-    @PutMapping("/reduceHold")
-    public ResponseEntity<String> reduceHold(
-            @RequestBody List<OrderItemDTO> listOrderItemDTO
-    ){
-        orderService.reduceHold(listOrderItemDTO);
-        return ResponseEntity.ok("\"Hold success !\"");
-    }
 
     @GetMapping("/all-order-by")
     public ResponseEntity<List<OrderDTO>> getAllOrderByCustomerAndStatus(

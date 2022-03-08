@@ -11,10 +11,6 @@ public interface OrderService {
 
     void addNewOrder(String accessToken, OrderDTO orderDTO);
 
-    void holdOrder(List<OrderItemDTO> listOrderItemDTO);
-
-    void reduceHold(List<OrderItemDTO> listOrderItemDTO);
-
     OrderDTO findOrderByCustomerIdAndOrderId(long id, String accessToken);
 
     void cancelOrder(Long orderId, String cancelReason, String accessToken);

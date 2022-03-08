@@ -78,7 +78,6 @@ public class OrderServiceImpl implements OrderService {
                 orderItemEntity.setOrder(orderEntity);
                 ProductEntity product  = productRepository.findProductEntityById(orderItemEntity.getProduct());
                 productRepository.setProductQuantity(product.getId(), product.getQuantity()-orderItemEntity.getQuantity());
-                productRepository.setProductHoldQuantity(product.getId(), 0);
             }
             orderRepository.save(orderEntity);
             orderItemRepository.saveAll(listOrderItemEntity);
@@ -87,32 +86,6 @@ public class OrderServiceImpl implements OrderService {
         {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
-    }
-
-    @Override
-    public void holdOrder(List<OrderItemDTO> listOrderItemDTO) {
-            for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
-                ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
-                int diffQuantity = referenceProduct.getQuantity() - referenceProduct.getHoldQuantity();
-                if (orderItemDTO.getQuantity() > diffQuantity)
-                {
-                    throw new ApossBackendException(HttpStatus.CHECKPOINT, "Not having enough product's quantity");
-                }
-            }
-            for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
-                ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
-                System.out.println("product " + referenceProduct.getId() + ": " + referenceProduct.getHoldQuantity());
-                productRepository.setProductHoldQuantity(orderItemDTO.getProduct(),referenceProduct.getHoldQuantity()+orderItemDTO.getQuantity());
-                System.out.println("product " + productRepository.findProductEntityById(orderItemDTO.getProduct()).getId() + ": " + productRepository.findProductEntityById(orderItemDTO.getProduct()).getHoldQuantity());
-            }
-    }
-
-    @Override
-    public void reduceHold(List<OrderItemDTO> listOrderItemDTO) {
-            for (OrderItemDTO orderItemDTO: listOrderItemDTO) {
-                ProductEntity referenceProduct = productRepository.findProductEntityById(orderItemDTO.getProduct());
-                productRepository.setProductHoldQuantity(orderItemDTO.getProduct(), referenceProduct.getHoldQuantity() - orderItemDTO.getQuantity());
-            }
     }
 
     @Override
