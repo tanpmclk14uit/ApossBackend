@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface KindService {
     List<KindDTO> getAllKind();
-
+    List<KindDTO> getAllKindByCategoryId(Long categoryId);
 }

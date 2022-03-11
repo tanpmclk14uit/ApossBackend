@@ -19,30 +19,35 @@ public class KindServiceImpl implements KindService {
     private final KindRepository kindRepository;
     private final ModelMapper modelMapper;
 
-    public KindServiceImpl(KindRepository kindRepository, ModelMapper modelMapper){
+    public KindServiceImpl(KindRepository kindRepository, ModelMapper modelMapper) {
         this.kindRepository = kindRepository;
         this.modelMapper = modelMapper;
     }
 
     @Override
     public List<KindDTO> getAllKind() {
-        List<KindEntity> kindEntityList = kindRepository.findAll();
-        List<KindDTO> kindDTOList = new ArrayList<KindDTO>();
-        for (int i =0; i<kindEntityList.size() ; i++) {
-            KindEntity kindEntity = kindEntityList.get(i);
-            KindDTO kindDTO = new KindDTO();
-            List<ProductDTO> productDTOList = kindEntity.getProducts().stream().map(this::mapToProductDTO).collect(Collectors.toList());
-            kindDTO.setId(kindEntity.getId());
-            kindDTO.setName(kindEntity.getName());
-            kindDTO.setProducts(productDTOList);
-            kindDTO.setRating(kindEntity.getRating());
-            kindDTO.setTotalProducts(kindEntity.getTotalProduct());
-            kindDTO.setTotalPurchases(kindEntity.getPurchased());
-            kindDTO.setCategory(kindEntity.getIndustry().getId());
-            kindDTO.setImage(kindEntity.getImage());
-            kindDTOList.add(kindDTO);
-        }
-        return kindDTOList;
+        List<KindEntity> kindEntities = kindRepository.findAll();
+        return kindEntities.stream().map(this::mapToKindDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<KindDTO> getAllKindByCategoryId(Long categoryId) {
+        List<KindEntity> kindEntities = kindRepository.findKindEntitiesByIndustryId(categoryId);
+        return kindEntities.stream().map(this::mapToKindDTO).collect(Collectors.toList());
+    }
+
+    private KindDTO mapToKindDTO(KindEntity kindEntity) {
+        KindDTO kindDTO = new KindDTO();
+        List<ProductDTO> productDTOList = kindEntity.getProducts().stream().map(this::mapToProductDTO).collect(Collectors.toList());
+        kindDTO.setId(kindEntity.getId());
+        kindDTO.setName(kindEntity.getName());
+        kindDTO.setProducts(productDTOList);
+        kindDTO.setRating(kindEntity.getRating());
+        kindDTO.setTotalProducts(kindEntity.getTotalProduct());
+        kindDTO.setTotalPurchases(kindEntity.getPurchased());
+        kindDTO.setCategory(kindEntity.getIndustry().getId());
+        kindDTO.setImage(kindEntity.getImage());
+        return kindDTO;
     }
 
     private ProductDTO mapToProductDTO(ProductEntity productEntity) {

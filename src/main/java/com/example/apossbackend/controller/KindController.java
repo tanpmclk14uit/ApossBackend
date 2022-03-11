@@ -3,10 +3,10 @@ package com.example.apossbackend.controller;
 import com.example.apossbackend.model.dto.KindDTO;
 import com.example.apossbackend.model.entity.KindEntity;
 import com.example.apossbackend.service.KindService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.apossbackend.utils.AppConstants;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,14 +16,18 @@ public class KindController {
 
     private final KindService kindService;
 
-    public KindController(KindService kindService)
-    {
+    public KindController(KindService kindService) {
         this.kindService = kindService;
     }
 
-    @GetMapping("/kind_dto")
-    public List<KindDTO> getAllKind()
-    {
-        return kindService.getAllKind();
+    @GetMapping()
+    public ResponseEntity<List<KindDTO>> getAllKind(
+            @RequestParam(value = "categoryId", defaultValue = AppConstants.DEFAULT_CATEGORY_ID, required = false) long categoryId
+    ) {
+        if (categoryId != -1) {
+            return ResponseEntity.ok(kindService.getAllKind());
+        } else {
+            return ResponseEntity.ok(kindService.getAllKindByCategoryId(categoryId));
+        }
     }
 }
