@@ -25,9 +25,9 @@ public class KindController {
             @RequestParam(value = "categoryId", defaultValue = AppConstants.DEFAULT_CATEGORY_ID, required = false) long categoryId
     ) {
         if (categoryId != -1) {
-            return ResponseEntity.ok(kindService.getAllKind());
-        } else {
             return ResponseEntity.ok(kindService.getAllKindByCategoryId(categoryId));
+        } else {
+            return ResponseEntity.ok(kindService.getAllKind());
         }
     }
 }
