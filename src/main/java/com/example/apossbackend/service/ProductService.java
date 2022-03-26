@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ public interface ProductService {
     void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId);
     void deleteProductPropertyValueById(long id);
 
-    void applyPropertyValueForProduct(ProductPropertyValueDTO productPropertyValueDTO, long productId);
-    void removePropertyValueOfProduct(long productPropertyId, long productId);
-    void updatePropertyValueForProduct(ProductPropertyValueDTO productPropertyValueDTO, long productId);
+    void applyPropertyValueForProduct(SetDTO setDTO);
+    void removePropertyValueOfProduct(SetDTO setDTO);
+    void updatePropertyValueForProduct(SetDTO setDTO);
 }

@@ -6,22 +6,20 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @ToString
 @Getter
 @Setter
 @Entity
 @RequiredArgsConstructor
-@Table(name= "product_to_classify_product_value")
-public class ProductToClassifyProductValueEntity extends BaseEntity{
+@Table(name= "set_property")
+public class SetEntity extends BaseEntity{
 
-    @ManyToOne()
-    @JoinColumn(name = "classify_product_value_id",
-            referencedColumnName = "id",
-            nullable = false)
-    private ClassifyProductValueEntity classifyProductValue;
+    @Id
+    private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id",
             referencedColumnName = "id",
             nullable = false)
@@ -32,5 +30,8 @@ public class ProductToClassifyProductValueEntity extends BaseEntity{
 
     @Column(nullable = false)
     private int quantity;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "set")
+    private List<SetValueEntity> setValueEntity;
 
 }
