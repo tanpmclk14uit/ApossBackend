@@ -9,6 +9,7 @@ import com.example.apossbackend.repository.*;
 import com.example.apossbackend.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.PropertyValue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,14 +175,13 @@ public class ProductServiceImpl implements ProductService {
             List<SetValueEntity> setValueEntities = setValueRepository.findSetValueEntitiesBySetId(productPropertyDTO.getId());
             for (SetValueEntity setValueEntity : setValueEntities) {
                 List<ClassifyProductValueEntity> classifyProductValueEntities = classifyProductValueRepository.findClassifyProductValueEntitiesById(setValueEntity.getClassifyProductValue().getId());
-                for (ClassifyProductValueEntity classifyProductValueEntity: classifyProductValueEntities) {
+                for (ClassifyProductValueEntity classifyProductValueEntity : classifyProductValueEntities) {
                     if (!listValue.contains(classifyProductValueEntity.getId())) {
                         productPropertyValueDTOS.add(mapToProductPropertyValueDTO(classifyProductValueEntity, setValueEntity));
                         listValue.add(classifyProductValueEntity.getId());
                     } else {
-                        for (ProductPropertyValueDTO productPropertyValueDTO: productPropertyValueDTOS) {
-                            if (productPropertyValueDTO.getId() == classifyProductValueEntity.getId())
-                            {
+                        for (ProductPropertyValueDTO productPropertyValueDTO : productPropertyValueDTOS) {
+                            if (productPropertyValueDTO.getId() == classifyProductValueEntity.getId()) {
                                 productPropertyValueDTO.setQuantity(productPropertyValueDTO.getQuantity() + setValueEntity.getSet().getQuantity());
                                 break;
                             }
@@ -297,67 +299,74 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void applyPropertyValueForProduct(SetDTO setDTO) {
-        ProductEntity product = productRepository.findById(setDTO.getProductId()).orElseThrow(
-                () -> new ResourceNotFoundException("Product", "Id", setDTO.getProductId())
+    public void createNewSetForProduct(SetDTO setDTO, long productId) {
+        SetEntity setEntity = new SetEntity();
+        ProductEntity product = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "Id", productId)
         );
-        List<SetValueEntity> setValueEntityList = new ArrayList<>();
-        for ( SetValueDTO setValueDTO: setDTO.getSetValueDTOList()) {
-            ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(setValueDTO.getPropertyValueId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Product property value", "Id", setValueDTO.getPropertyValueId())
-            );
-            SetValueEntity setValueEntity = convertSetValueDTOToEntity(setValueDTO, classifyProductValueEntity);
-            setValueEntityList.add(setValueEntity);
+        setEntity.setAdditionalPrice(setDTO.getAdditionalPrice());
+        setEntity.setQuantity(setDTO.getQuantity());
+        setEntity.setProduct(product);
+        setEntity = productPropertyRepository.saveAndFlush(setEntity);
+        for (long id : setDTO.getValueIds()) {
+            createNewSetValueEntity(setEntity, id);
         }
+    }
 
-        SetEntity setEntity = convertSetDTOToEntity(setDTO, product, setValueEntityList);
-        productPropertyRepository.save(setEntity);
+    private void createNewSetValueEntity(SetEntity setEntity, long propertyValueId) {
+        ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(propertyValueId).orElseThrow(
+                () -> new ResourceNotFoundException("Product property value", "Id", propertyValueId)
+        );
+        SetValueEntity setValueEntity = new SetValueEntity();
+        setValueEntity.setSet(setEntity);
+        setValueEntity.setClassifyProductValue(classifyProductValueEntity);
+        setValueRepository.save(setValueEntity);
     }
 
 
-    @Override
-    public void updatePropertyValueForProduct(SetDTO setDTO) {
-        ProductEntity product = productRepository.findById(setDTO.getProductId()).orElseThrow(
-                () -> new ResourceNotFoundException("Product", "Id", setDTO.getProductId())
-        );
-        List<SetValueEntity> setValueEntityList = new ArrayList<>();
-        for ( SetValueDTO setValueDTO: setDTO.getSetValueDTOList()) {
-            ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(setValueDTO.getPropertyValueId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Product property value", "Id", setValueDTO.getPropertyValueId())
-            );
-            SetValueEntity setValueEntity = convertSetValueDTOToEntity(setValueDTO, classifyProductValueEntity);
-            setValueEntityList.add(setValueEntity);
-        }
+    //    @Override
+//    public void updatePropertyValueForProduct(SetDTO setDTO) {
+//        ProductEntity product = productRepository.findById(setDTO.getProductId()).orElseThrow(
+//                () -> new ResourceNotFoundException("Product", "Id", setDTO.getProductId())
+//        );
+//        List<SetValueEntity> setValueEntityList = new ArrayList<>();
+//        for ( SetValueDTO setValueDTO: setDTO.getSetValueDTOList()) {
+//            ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(setValueDTO.getPropertyValueId()).orElseThrow(
+//                    () -> new ResourceNotFoundException("Product property value", "Id", setValueDTO.getPropertyValueId())
+//            );
+//            SetValueEntity setValueEntity = convertSetValueDTOToEntity(setValueDTO, classifyProductValueEntity);
+//            setValueEntityList.add(setValueEntity);
+//        }
+//
+//        SetEntity setEntity = convertSetDTOToEntity(setDTO, product, setValueEntityList);
+//        productPropertyRepository.save(setEntity);
+//    }
+//
+//    @Override
+//    public void removePropertyValueOfProduct(SetDTO setDTO) {
+//        ProductEntity product = productRepository.findById(setDTO.getProductId()).orElseThrow(
+//                () -> new ResourceNotFoundException("Product", "Id", setDTO.getProductId())
+//        );
+//        for ( SetValueDTO setValueDTO: setDTO.getSetValueDTOList()) {
+//            ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(setValueDTO.getPropertyValueId()).orElseThrow(
+//                    () -> new ResourceNotFoundException("Product property value", "Id", setValueDTO.getPropertyValueId())
+//            );
+//        }
+//        SetEntity setEntity = productPropertyRepository.findById(setDTO.getSetId()).orElseThrow(
+//                () -> new ResourceNotFoundException("Set", "Id", setDTO.getSetId())
+//        );
+//        productPropertyRepository.delete(setEntity);
+//    }
 
-        SetEntity setEntity = convertSetDTOToEntity(setDTO, product, setValueEntityList);
-        productPropertyRepository.save(setEntity);
-    }
-
-    @Override
-    public void removePropertyValueOfProduct(SetDTO setDTO) {
-        ProductEntity product = productRepository.findById(setDTO.getProductId()).orElseThrow(
-                () -> new ResourceNotFoundException("Product", "Id", setDTO.getProductId())
-        );
-        for ( SetValueDTO setValueDTO: setDTO.getSetValueDTOList()) {
-            ClassifyProductValueEntity classifyProductValueEntity = classifyProductValueRepository.findById(setValueDTO.getPropertyValueId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Product property value", "Id", setValueDTO.getPropertyValueId())
-            );
-        }
-        SetEntity setEntity = productPropertyRepository.findById(setDTO.getSetId()).orElseThrow(
-                () -> new ResourceNotFoundException("Set", "Id", setDTO.getSetId())
-        );
-        productPropertyRepository.delete(setEntity);
-    }
-
-    private ClassifyProductValueEntity convertProductPropertyValueDTOToClassifyProductValueEntity(ProductPropertyValueDTO productPropertyValueDTO, ProductPropertyDTO productPropertyDTO){
-        ClassifyProductValueEntity classifyProductValueEntity =  new ClassifyProductValueEntity();
+    private ClassifyProductValueEntity convertProductPropertyValueDTOToClassifyProductValueEntity(ProductPropertyValueDTO productPropertyValueDTO, ProductPropertyDTO productPropertyDTO) {
+        ClassifyProductValueEntity classifyProductValueEntity = new ClassifyProductValueEntity();
         classifyProductValueEntity.setValue(productPropertyValueDTO.getValue());
         classifyProductValueEntity.setName(productPropertyValueDTO.getName());
         classifyProductValueEntity.setClassifyProduct(classifyProductRepository.findClassifyProductEntityById(productPropertyDTO.getId()));
         return classifyProductValueEntity;
     }
 
-    private SetEntity convertSetDTOToEntity(SetDTO setDTO, ProductEntity productEntity, List<SetValueEntity> setValueEntityList){
+    private SetEntity convertSetDTOToEntity(SetDTO setDTO, ProductEntity productEntity, List<SetValueEntity> setValueEntityList) {
         SetEntity setEntity = new SetEntity();
         setEntity.setProduct(productEntity);
         setEntity.setSetValueEntity(setValueEntityList);
@@ -365,14 +374,14 @@ public class ProductServiceImpl implements ProductService {
         setEntity.setAdditionalPrice(setDTO.getAdditionalPrice());
         setEntity.setCreateTime(new Timestamp(new Date().getTime()));
         setEntity.setUpdateTime(new Timestamp(new Date().getTime()));
-        for (SetValueEntity setValue:
-             setEntity.getSetValueEntity()) {
+        for (SetValueEntity setValue :
+                setEntity.getSetValueEntity()) {
             setValue.setSet(setEntity);
         }
         return setEntity;
     }
 
-    private SetValueEntity convertSetValueDTOToEntity(SetValueDTO setValueDTO, ClassifyProductValueEntity classifyProductValueEntity){
+    private SetValueEntity convertSetValueDTOToEntity(SetValueDTO setValueDTO, ClassifyProductValueEntity classifyProductValueEntity) {
         SetValueEntity setValueEntity = new SetValueEntity();
         setValueEntity.setClassifyProductValue(classifyProductValueEntity);
         setValueEntity.setCreateTime(new Timestamp(new Date().getTime()));

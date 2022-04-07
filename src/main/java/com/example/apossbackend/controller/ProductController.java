@@ -65,28 +65,31 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.getAllProductImageByProductId(id));
     }
+
     @PostMapping("/image")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> addNewImage(
             @RequestBody NewProductImageDTO newProductImageDTO
-    ){
+    ) {
         productService.createNewProductImage(newProductImageDTO);
         return ResponseEntity.ok("Add new product image success");
     }
+
     @PutMapping("/image/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateProductImage(
             @RequestBody NewProductImageDTO newProductImageDTO,
             @PathVariable(value = "id") long id
-    ){
+    ) {
         productService.updateProductImageById(newProductImageDTO, id);
         return ResponseEntity.ok("Update product image success");
     }
+
     @DeleteMapping("/image/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteProductImage(
             @PathVariable(value = "id") long id
-    ){
+    ) {
         productService.deleteProductImageById(id);
         return ResponseEntity.ok("Remove product image success");
     }
@@ -137,15 +140,16 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> createNewProperty(
             @RequestBody ProductPropertyDTO productPropertyDTO
-    ){
+    ) {
         productService.createNewProductProperty(productPropertyDTO);
         return ResponseEntity.ok("Create new property success");
     }
+
     @DeleteMapping("/property/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteProperty(
             @PathVariable("id") long id
-    ){
+    ) {
         productService.deleteProductPropertyById(id);
         return ResponseEntity.ok("Remove product property success");
     }
@@ -155,8 +159,8 @@ public class ProductController {
     public ResponseEntity<String> createNewPropertyValue(
             @RequestBody ProductPropertyValueDTO productPropertyValueDTO,
             @PathVariable("id") long propertyId
-    ){
-        productService.createNewProductPropertyValue(productPropertyValueDTO,propertyId);
+    ) {
+        productService.createNewProductPropertyValue(productPropertyValueDTO, propertyId);
         return ResponseEntity.ok("Create new property value success");
     }
 
@@ -164,36 +168,39 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deletePropertyValue(
             @PathVariable("id") long id
-    ){
+    ) {
         productService.deleteProductPropertyValueById(id);
         return ResponseEntity.ok("Remove product property value success");
     }
-    @PostMapping("/{id}/property-value")
+
+    @PostMapping("/{id}/set")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> applyPropertyValueForProduct(
-            @RequestBody SetDTO setDTO
-    ){
-        productService.applyPropertyValueForProduct(setDTO);
+    public ResponseEntity<String> createNewSetForProduct(
+            @RequestBody SetDTO setDTO,
+            @PathVariable("id") long id
+    ) {
+        productService.createNewSetForProduct(setDTO, id);
         return ResponseEntity.ok("Apply property value for product success");
     }
 
-    @PutMapping("/{id}/property-value")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> editPropertyValueForProduct(
-            @RequestBody SetDTO setDTO
-    ){
-        productService.updatePropertyValueForProduct(setDTO);
-        return ResponseEntity.ok("Update property value for product success");
-    }
-    @DeleteMapping("/{id}/property-value/{valueId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deletePropertyValue(
-            @RequestBody SetDTO setDTO
-    ){
-        productService.removePropertyValueOfProduct(setDTO);
-        return ResponseEntity.ok("Remove product property value success");
-    }
 
+//    @PutMapping("/{id}/property-value")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<String> editPropertyValueForProduct(
+//            @RequestBody SetDTO setDTO
+//    ) {
+//        productService.updatePropertyValueForProduct(setDTO);
+//        return ResponseEntity.ok("Update property value for product success");
+//    }
+//
+//    @DeleteMapping("/{id}/property-value/{valueId}")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<String> deletePropertyValue(
+//            @RequestBody SetDTO setDTO
+//    ) {
+//        productService.removePropertyValueOfProduct(setDTO);
+//        return ResponseEntity.ok("Remove product property value success");
+//    }
 
 
 }

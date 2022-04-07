@@ -7,8 +7,7 @@ import java.util.List;
 @Data
 public class SetDTO {
     private long setId;
-    private long productId;
     private int additionalPrice;
     private int quantity;
-    private List<SetValueDTO> setValueDTOList;
+    private List<Long> valueIds;
 }

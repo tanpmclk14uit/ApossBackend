@@ -13,11 +13,8 @@ import java.util.List;
 @Setter
 @Entity
 @RequiredArgsConstructor
-@Table(name= "set_property")
+@Table(name= "set_of_product")
 public class SetEntity extends BaseEntity{
-
-    @Id
-    private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id",

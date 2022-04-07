@@ -14,8 +14,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "set_value")
 public class SetValueEntity extends BaseEntity{
-    @Id
-    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "set_id",

@@ -49,7 +49,7 @@ public interface ProductService {
     void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId);
     void deleteProductPropertyValueById(long id);
 
-    void applyPropertyValueForProduct(SetDTO setDTO);
-    void removePropertyValueOfProduct(SetDTO setDTO);
-    void updatePropertyValueForProduct(SetDTO setDTO);
+    void createNewSetForProduct(SetDTO setDTO, long productId);
+//    void removePropertyValueOfProduct(SetDTO setDTO);
+//    void updatePropertyValueForProduct(SetDTO setDTO);
 }
