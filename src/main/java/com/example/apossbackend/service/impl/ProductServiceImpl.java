@@ -83,16 +83,6 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(productImageEntity, ProductImageDTO.class);
     }
 
-    private ProductPropertyValueDTO mapToProductPropertyValueDTO(ClassifyProductValueEntity productValue, SetValueEntity setValueEntity) {
-        ProductPropertyValueDTO productPropertyValueDTO = new ProductPropertyValueDTO();
-        productPropertyValueDTO.setId(productValue.getId());
-        productPropertyValueDTO.setName(productValue.getName());
-        productPropertyValueDTO.setQuantity(setValueEntity.getSet().getQuantity());
-        productPropertyValueDTO.setAdditionalPrice(setValueEntity.getSet().getAdditionalPrice());
-        productPropertyValueDTO.setValue(productValue.getValue());
-        return productPropertyValueDTO;
-    }
-
     @Override
     public ProductsResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
         //Sort
@@ -169,29 +159,22 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductPropertyDTO> getAllPropertyOfProductId(long id, boolean isColor) {
         List<ProductPropertyDTO> productPropertyDTOS = productPropertyRepository.findProductPropertyIdByProductId(id, isColor);
-        ArrayList<Long> listValue = new ArrayList<>();
         for (ProductPropertyDTO productPropertyDTO : productPropertyDTOS) {
-            ArrayList<ProductPropertyValueDTO> productPropertyValueDTOS = new ArrayList<>();
-            List<SetValueEntity> setValueEntities = setValueRepository.findSetValueEntitiesBySetId(productPropertyDTO.getId());
-            for (SetValueEntity setValueEntity : setValueEntities) {
-                List<ClassifyProductValueEntity> classifyProductValueEntities = classifyProductValueRepository.findClassifyProductValueEntitiesById(setValueEntity.getClassifyProductValue().getId());
-                for (ClassifyProductValueEntity classifyProductValueEntity : classifyProductValueEntities) {
-                    if (!listValue.contains(classifyProductValueEntity.getId())) {
-                        productPropertyValueDTOS.add(mapToProductPropertyValueDTO(classifyProductValueEntity, setValueEntity));
-                        listValue.add(classifyProductValueEntity.getId());
-                    } else {
-                        for (ProductPropertyValueDTO productPropertyValueDTO : productPropertyValueDTOS) {
-                            if (productPropertyValueDTO.getId() == classifyProductValueEntity.getId()) {
-                                productPropertyValueDTO.setQuantity(productPropertyValueDTO.getQuantity() + setValueEntity.getSet().getQuantity());
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            productPropertyDTO.setValueDTOS(productPropertyValueDTOS);
+            List<ClassifyProductValueEntity> classifyProductValueEntities = classifyProductValueRepository.findClassifyProductValueEntitiesByClassifyProductId(productPropertyDTO.getId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Property value", "Property Id", productPropertyDTO.getId())
+            );
+            List<ProductPropertyValueDTO> classifyProductValueDTOS = classifyProductValueEntities.stream().map(this::mapClassifyProductValueEntityToProductPropertyValueDTO).collect(Collectors.toList());
+            productPropertyDTO.setValueDTOS(classifyProductValueDTOS);
         }
         return productPropertyDTOS;
+    }
+
+    private ProductPropertyValueDTO mapClassifyProductValueEntityToProductPropertyValueDTO(ClassifyProductValueEntity classifyProductValue) {
+        ProductPropertyValueDTO productPropertyValueDTO = new ProductPropertyValueDTO();
+        productPropertyValueDTO.setValue(classifyProductValue.getValue());
+        productPropertyValueDTO.setName(classifyProductValue.getName());
+        productPropertyValueDTO.setId(classifyProductValue.getId());
+        return productPropertyValueDTO;
     }
 
     @Override

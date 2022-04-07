@@ -109,6 +109,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllPropertyOfProductId(id, isColor));
     }
 
+
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> createNewProduct(
