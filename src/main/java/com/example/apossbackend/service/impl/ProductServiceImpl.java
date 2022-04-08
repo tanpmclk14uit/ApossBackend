@@ -142,6 +142,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public int getQuantityByValueIds(List<Long> valueIds, long productId) {
+        int sum = 0;
+        List<Integer> setQuantities = productPropertyRepository.getTotalQuantityOfProductBySpecifyPropertyValuesIdAndProductId(productId, valueIds, valueIds.size());
+        for (Integer quantity : setQuantities) {
+            sum += quantity;
+        }
+        return sum;
+    }
+
+    @Override
     public List<ProductRatingDTO> getAllProductRatingOfProductId(long id) {
         ProductEntity product = productRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Product", "id", id)

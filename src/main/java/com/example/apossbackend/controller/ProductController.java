@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -109,6 +110,15 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllPropertyOfProductId(id, isColor));
     }
 
+    @GetMapping("/{id}/property-values/quantity")
+    public ResponseEntity<Integer> getQuantityOfSetValueByProperty(
+            @PathVariable(value = "id") long id,
+            @RequestParam(value = "valueIds") List<Long> valueIds
+
+    ) {
+        return ResponseEntity.ok(productService.getQuantityByValueIds(valueIds,id));
+    }
+
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
@@ -191,7 +201,6 @@ public class ProductController {
     ) {
         return ResponseEntity.ok("\"Apply default property value for product success\"");
     }
-
 
 
 //    @PutMapping("/{id}/property-value")

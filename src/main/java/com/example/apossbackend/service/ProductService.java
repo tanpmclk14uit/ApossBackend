@@ -31,6 +31,8 @@ public interface ProductService {
 
     List<ProductPropertyDTO> getAllPropertyOfProductId(long id, boolean isColor);
 
+    int getQuantityByValueIds(List<Long> valueIds, long productId);
+
     long createNewProduct(NewProductDTO newProductDTO);
 
     void updateProductById(NewProductDTO newProductDTO, Long id);
