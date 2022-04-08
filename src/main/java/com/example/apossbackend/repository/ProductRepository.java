@@ -20,7 +20,6 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     Page<ProductEntity> findAllByNameContains(String name, Pageable pageable);
-    Page<ProductEntity> getProductEntitiesByNameContaining(String name, Pageable pageable);
 
     Page<ProductEntity> findProductEntityByKindId(long kindId, Pageable pageable);
 
@@ -30,5 +29,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Modifying( clearAutomatically = true)
     @Query("update ProductEntity product set product.quantity = :quantity WHERE product.id = :productId")
     void setProductQuantity(@Param("productId") Long id, @Param("quantity") int quantity);
+
 
 }

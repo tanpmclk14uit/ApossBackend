@@ -181,8 +181,17 @@ public class ProductController {
             @PathVariable("id") long id
     ) {
         productService.createNewSetForProduct(setDTO, id);
-        return ResponseEntity.ok("Apply property value for product success");
+        return ResponseEntity.ok("\"Apply property value for product success\"");
     }
+
+    @PostMapping("/{id}/defaultSet")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> createDefaultSetForProduct(
+            @PathVariable("id") long id
+    ) {
+        return ResponseEntity.ok("\"Apply default property value for product success\"");
+    }
+
 
 
 //    @PutMapping("/{id}/property-value")

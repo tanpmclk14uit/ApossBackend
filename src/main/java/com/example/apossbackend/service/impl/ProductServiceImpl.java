@@ -1,6 +1,5 @@
 package com.example.apossbackend.service.impl;
 
-import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.ProductsResponse;
 import com.example.apossbackend.model.dto.*;
@@ -9,22 +8,16 @@ import com.example.apossbackend.repository.*;
 import com.example.apossbackend.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.PropertyValue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -159,22 +152,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductPropertyDTO> getAllPropertyOfProductId(long id, boolean isColor) {
         List<ProductPropertyDTO> productPropertyDTOS = productPropertyRepository.findProductPropertyIdByProductId(id, isColor);
+
         for (ProductPropertyDTO productPropertyDTO : productPropertyDTOS) {
-            List<ClassifyProductValueEntity> classifyProductValueEntities = classifyProductValueRepository.findClassifyProductValueEntitiesByClassifyProductId(productPropertyDTO.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Property value", "Property Id", productPropertyDTO.getId())
-            );
-            List<ProductPropertyValueDTO> classifyProductValueDTOS = classifyProductValueEntities.stream().map(this::mapClassifyProductValueEntityToProductPropertyValueDTO).collect(Collectors.toList());
+            List<ProductPropertyValueDTO> classifyProductValueDTOS = productPropertyRepository.findProductPropertyValueByProductIdAndPropertyId(id, productPropertyDTO.getId());
             productPropertyDTO.setValueDTOS(classifyProductValueDTOS);
         }
         return productPropertyDTOS;
-    }
-
-    private ProductPropertyValueDTO mapClassifyProductValueEntityToProductPropertyValueDTO(ClassifyProductValueEntity classifyProductValue) {
-        ProductPropertyValueDTO productPropertyValueDTO = new ProductPropertyValueDTO();
-        productPropertyValueDTO.setValue(classifyProductValue.getValue());
-        productPropertyValueDTO.setName(classifyProductValue.getName());
-        productPropertyValueDTO.setId(classifyProductValue.getId());
-        return productPropertyValueDTO;
     }
 
     @Override
@@ -307,7 +290,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    //    @Override
+//        @Override
 //    public void updatePropertyValueForProduct(SetDTO setDTO) {
 //        ProductEntity product = productRepository.findById(setDTO.getProductId()).orElseThrow(
 //                () -> new ResourceNotFoundException("Product", "Id", setDTO.getProductId())
@@ -341,34 +324,34 @@ public class ProductServiceImpl implements ProductService {
 //        productPropertyRepository.delete(setEntity);
 //    }
 
-    private ClassifyProductValueEntity convertProductPropertyValueDTOToClassifyProductValueEntity(ProductPropertyValueDTO productPropertyValueDTO, ProductPropertyDTO productPropertyDTO) {
-        ClassifyProductValueEntity classifyProductValueEntity = new ClassifyProductValueEntity();
-        classifyProductValueEntity.setValue(productPropertyValueDTO.getValue());
-        classifyProductValueEntity.setName(productPropertyValueDTO.getName());
-        classifyProductValueEntity.setClassifyProduct(classifyProductRepository.findClassifyProductEntityById(productPropertyDTO.getId()));
-        return classifyProductValueEntity;
-    }
+//    private ClassifyProductValueEntity convertProductPropertyValueDTOToClassifyProductValueEntity(ProductPropertyValueDTO productPropertyValueDTO, ProductPropertyDTO productPropertyDTO) {
+//        ClassifyProductValueEntity classifyProductValueEntity = new ClassifyProductValueEntity();
+//        classifyProductValueEntity.setValue(productPropertyValueDTO.getValue());
+//        classifyProductValueEntity.setName(productPropertyValueDTO.getName());
+//        classifyProductValueEntity.setClassifyProduct(classifyProductRepository.findClassifyProductEntityById(productPropertyDTO.getId()));
+//        return classifyProductValueEntity;
+//    }
+//
+//    private SetEntity convertSetDTOToEntity(SetDTO setDTO, ProductEntity productEntity, List<SetValueEntity> setValueEntityList) {
+//        SetEntity setEntity = new SetEntity();
+//        setEntity.setProduct(productEntity);
+//        setEntity.setSetValueEntity(setValueEntityList);
+//        setEntity.setQuantity(setDTO.getQuantity());
+//        setEntity.setAdditionalPrice(setDTO.getAdditionalPrice());
+//        setEntity.setCreateTime(new Timestamp(new Date().getTime()));
+//        setEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+//        for (SetValueEntity setValue :
+//                setEntity.getSetValueEntity()) {
+//            setValue.setSet(setEntity);
+//        }
+//        return setEntity;
+//    }
 
-    private SetEntity convertSetDTOToEntity(SetDTO setDTO, ProductEntity productEntity, List<SetValueEntity> setValueEntityList) {
-        SetEntity setEntity = new SetEntity();
-        setEntity.setProduct(productEntity);
-        setEntity.setSetValueEntity(setValueEntityList);
-        setEntity.setQuantity(setDTO.getQuantity());
-        setEntity.setAdditionalPrice(setDTO.getAdditionalPrice());
-        setEntity.setCreateTime(new Timestamp(new Date().getTime()));
-        setEntity.setUpdateTime(new Timestamp(new Date().getTime()));
-        for (SetValueEntity setValue :
-                setEntity.getSetValueEntity()) {
-            setValue.setSet(setEntity);
-        }
-        return setEntity;
-    }
-
-    private SetValueEntity convertSetValueDTOToEntity(SetValueDTO setValueDTO, ClassifyProductValueEntity classifyProductValueEntity) {
-        SetValueEntity setValueEntity = new SetValueEntity();
-        setValueEntity.setClassifyProductValue(classifyProductValueEntity);
-        setValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
-        setValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
-        return setValueEntity;
-    }
+//    private SetValueEntity convertSetValueDTOToEntity(SetValueDTO setValueDTO, ClassifyProductValueEntity classifyProductValueEntity) {
+//        SetValueEntity setValueEntity = new SetValueEntity();
+//        setValueEntity.setClassifyProductValue(classifyProductValueEntity);
+//        setValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
+//        setValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+//        return setValueEntity;
+//    }
 }
