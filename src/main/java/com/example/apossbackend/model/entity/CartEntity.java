@@ -21,10 +21,10 @@ public class CartEntity extends BaseEntity{
     private CustomerEntity customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id",
+    @JoinColumn(name = "set_id",
             referencedColumnName = "id",
             nullable = false)
-    private ProductEntity product;
+    private SetEntity set;
 
     @Column(nullable = false)
     private int quantity;

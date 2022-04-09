@@ -6,8 +6,10 @@ import com.example.apossbackend.model.dto.CartDTO;
 import com.example.apossbackend.model.entity.CartEntity;
 import com.example.apossbackend.model.entity.CustomerEntity;
 import com.example.apossbackend.model.entity.ProductEntity;
+import com.example.apossbackend.model.entity.SetEntity;
 import com.example.apossbackend.repository.CartRepository;
 import com.example.apossbackend.repository.CustomerRepository;
+import com.example.apossbackend.repository.ProductPropertyRepository;
 import com.example.apossbackend.repository.ProductRepository;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.CartService;
@@ -25,21 +27,32 @@ public class CartServiceImpl implements CartService {
 
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final ProductPropertyRepository productPropertyRepository;
     private final CartRepository cartRepository;
     private final JwtTokenProvider tokenProvider;
 
     @Autowired
-    public CartServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, CartRepository cartRepository, JwtTokenProvider tokenProvider) {
+    public CartServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository, ProductPropertyRepository productPropertyRepository, CartRepository cartRepository, JwtTokenProvider tokenProvider) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
+        this.productPropertyRepository = productPropertyRepository;
         this.cartRepository = cartRepository;
         this.tokenProvider = tokenProvider;
     }
 
+
     @Override
     public CartEntity createNewCart(CartDTO cartDTO, String accessToken) {
-        String userName = tokenProvider.getUsernameFromJWT(accessToken);
-        CartEntity cartEntity = mapToCartEntity(cartDTO, userName);
+        CartEntity cartEntity;
+        if (cartRepository.existsDistinctBySetId(cartDTO.getSetId())) {
+            cartEntity = cartRepository.findCartEntityBySetId(cartDTO.getSetId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Set", "set id", cartDTO.getSetId())
+            );
+            cartEntity.setQuantity(cartEntity.getQuantity() + cartDTO.getQuantity());
+        } else {
+            String userName = tokenProvider.getUsernameFromJWT(accessToken);
+            cartEntity = mapToCartEntity(cartDTO, userName);
+        }
         cartRepository.save(cartEntity);
         return cartEntity;
     }
@@ -57,13 +70,13 @@ public class CartServiceImpl implements CartService {
                 () -> new ResourceNotFoundException("Cart", "id", cartDTO.getId())
         );
         String userName = tokenProvider.getUsernameFromJWT(accessToken);
-        if(cartEntity.getCustomer().getEmail().equals(userName)){
+        if (cartEntity.getCustomer().getEmail().equals(userName)) {
             cartEntity.setSelect(cartDTO.isSelect());
             cartEntity.setUpdateTime(new Timestamp(new Date().getTime()));
             cartEntity.setQuantity(cartDTO.getQuantity());
             cartRepository.save(cartEntity);
-        }else {
-            throw  new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        } else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
     }
 
@@ -73,13 +86,12 @@ public class CartServiceImpl implements CartService {
                 () -> new ResourceNotFoundException("Cart", "id", id)
         );
         String userName = tokenProvider.getUsernameFromJWT(accessToken);
-        if(cartEntity.getCustomer().getEmail().equals(userName)){
+        if (cartEntity.getCustomer().getEmail().equals(userName)) {
             cartRepository.delete(cartEntity);
-        }else {
-            throw  new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        } else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
         }
     }
-
 
 
     private CartEntity mapToCartEntity(CartDTO cartDTO, String userName) {
@@ -90,10 +102,10 @@ public class CartServiceImpl implements CartService {
                 () -> new ApossBackendException("Error", HttpStatus.BAD_REQUEST, "Not found customer")
         );
         cartEntity.setCustomer(customer);
-        ProductEntity productEntity = productRepository.findById(cartDTO.getProductId()).orElseThrow(
+        SetEntity set = productPropertyRepository.findById(cartDTO.getSetId()).orElseThrow(
                 () -> new ApossBackendException("Error", HttpStatus.BAD_REQUEST, "Not found product")
         );
-        cartEntity.setProduct(productEntity);
+        cartEntity.setSet(set);
         cartEntity.setQuantity(cartDTO.getQuantity());
         cartEntity.setProperty(cartDTO.getProperty());
         cartEntity.setSelect(cartDTO.isSelect());
@@ -102,18 +114,22 @@ public class CartServiceImpl implements CartService {
 
     private CartDTO mapToCartDTO(CartEntity cartEntity) {
         CartDTO cartDTO = new CartDTO();
-        long productId = cartEntity.getProduct().getId();
+        long setId = cartEntity.getSet().getId();
+        long productId = cartEntity.getSet().getProduct().getId();
         cartDTO.setId(cartEntity.getId());
-        cartDTO.setProductId(productId);
+        cartDTO.setSetId(setId);
         cartDTO.setProperty(cartEntity.getProperty());
         cartDTO.setQuantity(cartEntity.getQuantity());
         cartDTO.setSelect(cartEntity.isSelect());
         ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
-                () -> new ResourceNotFoundException("Cart", "product id", productId )
+                () -> new ResourceNotFoundException("Cart", "product id", productId)
+        );
+        SetEntity setEntity = productPropertyRepository.findById(setId).orElseThrow(
+                () -> new ResourceNotFoundException("Set", "set id", setId)
         );
         cartDTO.setName(productEntity.getName());
         cartDTO.setImageUrl(productEntity.getProductImages().get(0).getImageUrl());
-        cartDTO.setPrice(productEntity.getPrice());
+        cartDTO.setPrice(productEntity.getPrice() + setEntity.getAdditionalPrice());
         return cartDTO;
     }
 

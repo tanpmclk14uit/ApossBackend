@@ -50,4 +50,12 @@ public interface ProductPropertyRepository extends JpaRepository<SetEntity, Long
             "group by sop.id " +
             "having count(distinct sv.classifyProductValue.id) = :propertyValuesCount")
     List<Integer> getAdditionalPriceOfProductBySpecifyPropertyValuesIdAndProductId(@Param("productId") long productId, @Param("propertyValues") List<Long> propertyValuesId, @Param("propertyValuesCount") long propertyValuesCount);
+
+    @Query("select sop.id  FROM SetValueEntity sv " +
+            "left join SetEntity sop on sop.id = sv.set.id " +
+            "WHERE sv.classifyProductValue.id in :propertyValues " +
+            "and sop.product.id = :productId " +
+            "group by sop.id " +
+            "having count(distinct sv.classifyProductValue.id) = :propertyValuesCount")
+    List<Long> getSetOfProductBySpecifyPropertyValuesIdAndProductId(@Param("productId") long productId, @Param("propertyValues") List<Long> propertyValuesId, @Param("propertyValuesCount") long propertyValuesCount);
 }

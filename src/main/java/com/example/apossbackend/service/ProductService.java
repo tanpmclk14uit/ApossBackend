@@ -35,6 +35,8 @@ public interface ProductService {
 
     int getAdditionalPriceByValueIds(List<Long> valueIds, long productId);
 
+    long getSetIdByValuesIds(List<Long> valueIds, long productId);
+
     long createNewProduct(NewProductDTO newProductDTO);
 
     void updateProductById(NewProductDTO newProductDTO, Long id);

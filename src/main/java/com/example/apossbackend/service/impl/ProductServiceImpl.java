@@ -154,11 +154,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public int getAdditionalPriceByValueIds(List<Long> valueIds, long productId) {
         List<Integer> setAdditionalPrices = productPropertyRepository.getAdditionalPriceOfProductBySpecifyPropertyValuesIdAndProductId(productId, valueIds, valueIds.size());
-        if (setAdditionalPrices.size() == 1) {
-            return setAdditionalPrices.get(0);
-        } else {
-            return 0;
-        }
+        return setAdditionalPrices.size() == 1 ? setAdditionalPrices.get(0) : 0;
+    }
+
+    @Override
+    public long getSetIdByValuesIds(List<Long> valueIds, long productId) {
+        List<Long> setId = productPropertyRepository.getSetOfProductBySpecifyPropertyValuesIdAndProductId(productId, valueIds, valueIds.size());
+        return setId.size() == 1 ? setId.get(0) : -1;
     }
 
     @Override

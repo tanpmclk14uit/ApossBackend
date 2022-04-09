@@ -127,6 +127,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAdditionalPriceByValueIds(valueIds, id));
     }
 
+    @GetMapping("/{id}/property-values/set")
+    public ResponseEntity<Long> getSetOfProductBySpecifyPropertyValueIds(
+            @PathVariable(value = "id") long id,
+            @RequestParam(value = "valueIds") List<Long> valueIds
+    ) {
+        return ResponseEntity.ok(productService.getSetIdByValuesIds(valueIds, id));
+    }
+
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> createNewProduct(
