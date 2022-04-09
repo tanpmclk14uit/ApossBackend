@@ -152,6 +152,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public int getAdditionalPriceByValueIds(List<Long> valueIds, long productId) {
+        List<Integer> setAdditionalPrices = productPropertyRepository.getAdditionalPriceOfProductBySpecifyPropertyValuesIdAndProductId(productId, valueIds, valueIds.size());
+        if (setAdditionalPrices.size() == 1) {
+            return setAdditionalPrices.get(0);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
     public List<ProductRatingDTO> getAllProductRatingOfProductId(long id) {
         ProductEntity product = productRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Product", "id", id)

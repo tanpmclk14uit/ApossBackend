@@ -116,9 +116,16 @@ public class ProductController {
             @RequestParam(value = "valueIds") List<Long> valueIds
 
     ) {
-        return ResponseEntity.ok(productService.getQuantityByValueIds(valueIds,id));
+        return ResponseEntity.ok(productService.getQuantityByValueIds(valueIds, id));
     }
 
+    @GetMapping("/{id}/property-values/additional-price")
+    public ResponseEntity<Integer> getAdditionalPriceOfSetValueByProperty(
+            @PathVariable(value = "id") long id,
+            @RequestParam(value = "valueIds") List<Long> valueIds
+    ) {
+        return ResponseEntity.ok(productService.getAdditionalPriceByValueIds(valueIds, id));
+    }
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
