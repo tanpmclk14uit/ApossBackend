@@ -12,4 +12,5 @@ public interface CartRepository extends JpaRepository<CartEntity, Long> {
     Optional<CartEntity>  findCartEntityById(long id);
     Boolean existsDistinctBySetId(long id);
     Optional<CartEntity> findCartEntityBySetId(long id);
+    void deleteById(long id);
 }

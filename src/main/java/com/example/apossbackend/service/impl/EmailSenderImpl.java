@@ -30,11 +30,10 @@ public class EmailSenderImpl implements EmailSender {
             helper.setText(email, true);
             helper.setTo(to);
             helper.setSubject("Confirm APOSS account");
-            helper.setFrom("aposs@gmail.com");
             mailSender.send(mimeMessage);
         }catch (MessagingException e){
             LOGGER.error("Failed to send email", e);
-            throw new IllegalStateException("Failed to sen email");
+            throw new IllegalStateException("Failed to send email");
         }
     }
 }

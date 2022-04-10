@@ -36,15 +36,6 @@ public class OrderEntity extends BaseEntity {
     private String deliveryAddress;
 
     @Column(nullable = false)
-    private long province;
-
-    @Column(nullable = false)
-    private  long district;
-
-    @Column(nullable = false)
-    private long ward;
-
-    @Column(nullable = false)
     private OrderStatus status;
 
     @OneToMany(
