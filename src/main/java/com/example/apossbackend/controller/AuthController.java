@@ -33,7 +33,7 @@ public class AuthController {
     private final EmailSender emailSender;
     private final CustomerService customerService;
 
-    @Value("app.confirm-token-link")
+    @Value("${app.confirm-token-link}")
     private String confirmTokenLink;
 
     @Autowired
