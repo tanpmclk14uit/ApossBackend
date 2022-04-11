@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -157,6 +158,7 @@ public class ProductServiceImpl implements ProductService {
         return setAdditionalPrices.size() == 1 ? setAdditionalPrices.get(0) : 0;
     }
 
+
     @Override
     public long getSetIdByValuesIds(List<Long> valueIds, long productId) {
         List<Long> setId = productPropertyRepository.getSetOfProductBySpecifyPropertyValuesIdAndProductId(productId, valueIds, valueIds.size());
@@ -189,6 +191,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(newProductDTO.getPrice());
         product.setDescription(newProductDTO.getDescription());
         product.setQuantity(newProductDTO.getQuantity());
+        product.setRating(5.0F);
         KindEntity kind = kindRepository.findById(newProductDTO.getKindId()).orElseThrow(
                 () -> new ResourceNotFoundException("Kind", "Id", newProductDTO.getKindId())
         );
@@ -197,6 +200,22 @@ public class ProductServiceImpl implements ProductService {
         product.setUpdateTime(new Timestamp(new Date().getTime()));
         return productRepository.save(product).getId();
     }
+
+    @Override
+    public long createNewProductWithDefaultSet(NewProductDTO newProductDTO) {
+        long newProductId = createNewProduct(newProductDTO);
+        createDefaultSetForProduct(newProductId, newProductDTO.getQuantity());
+        return newProductId;
+    }
+
+    private void createDefaultSetForProduct(long productId, int quantity) {
+        SetDTO setDTO = new SetDTO();
+        setDTO.setQuantity(quantity);
+        setDTO.setAdditionalPrice(0);
+        setDTO.setValueIds(List.of(0L));
+        createNewSetForProduct(setDTO, productId);
+    }
+
 
     @Override
     public void updateProductById(NewProductDTO newProductDTO, Long id) {
@@ -288,6 +307,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void createNewSetForProduct(SetDTO setDTO, long productId) {
+
         SetEntity setEntity = new SetEntity();
         ProductEntity product = productRepository.findById(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Product", "Id", productId)

@@ -143,6 +143,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.createNewProduct(newProductDTO));
     }
 
+    @PostMapping("/with-default-set")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Long> createNewProductWithDefaultSet(
+            @RequestBody NewProductDTO newProductDTO
+    ) {
+        return ResponseEntity.ok(productService.createNewProductWithDefaultSet(newProductDTO));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateProduct(

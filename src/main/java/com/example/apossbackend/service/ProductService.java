@@ -39,6 +39,8 @@ public interface ProductService {
 
     long createNewProduct(NewProductDTO newProductDTO);
 
+    long createNewProductWithDefaultSet(NewProductDTO newProductDTO);
+
     void updateProductById(NewProductDTO newProductDTO, Long id);
 
     void deleteProductById(Long id);
