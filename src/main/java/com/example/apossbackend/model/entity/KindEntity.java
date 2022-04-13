@@ -27,12 +27,6 @@ public class KindEntity extends BaseEntity{
     private String name;
 
     @Column(nullable = false)
-    private float rating;
-
-    @Column(nullable = false)
-    private int purchased;
-
-    @Column(nullable = false)
     private int totalProduct;
 
     @Column(nullable = false)

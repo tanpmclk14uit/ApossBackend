@@ -30,9 +30,6 @@ public class IndustryServiceImpl implements IndustryService {
             detailCategoryDTO.setId(item.getId());
             detailCategoryDTO.setName(item.getName());
             detailCategoryDTO.setImages(item.getIndustryImages().stream().map(IndustryImageEntity::getImageUrl).collect(Collectors.toList()));
-            detailCategoryDTO.setRating(item.getRating());
-            detailCategoryDTO.setTotalProducts(item.getTotalProduct());
-            detailCategoryDTO.setTotalPurchases(item.getPurchased());
             detailCategoryDTOList.add(detailCategoryDTO);
         }
         return detailCategoryDTOList;

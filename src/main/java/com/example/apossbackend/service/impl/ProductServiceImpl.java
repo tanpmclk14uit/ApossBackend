@@ -91,6 +91,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductsResponse getTopFiveProductByPurchased() {
+        //Sort
+        Sort sort = Sort.by("purchased").descending();
+        //Pageable
+        Pageable pageable = PageRequest.of(0, 5, sort);
+        Page<ProductEntity> productsPage = productRepository.findAll(pageable);
+        return getProductsResponse(productsPage);
+    }
+
+    @Override
     public ProductsResponse getAllProductByKeyword(String keyword, int pageNo, int pageSize, String sortBy, String sortDir) {
         //Sort
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()

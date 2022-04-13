@@ -33,6 +33,11 @@ public class ProductController {
         return productService.getAllProduct(pageNo, pageSize, sortBy, sortDir);
     }
 
+    @GetMapping("/top5")
+    public ProductsResponse getTopFivePurchasedProduct() {
+        return productService.getTopFiveProductByPurchased();
+    }
+
     @GetMapping("/search")
     public ProductsResponse getAllProductsByKeyword(
             @RequestParam(value = "keyword", defaultValue = AppConstants.DEFAULT_KEYWORD, required = false) String keyword,
@@ -43,6 +48,7 @@ public class ProductController {
     ) {
         return productService.getAllProductByKeyword(keyword, pageNo, pageSize, sortBy, sortDir);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDetailDTO> getProductDetailById(

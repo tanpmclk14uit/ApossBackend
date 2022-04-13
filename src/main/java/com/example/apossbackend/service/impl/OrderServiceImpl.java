@@ -73,6 +73,8 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItemDTO orderItem : orderDTO.getOrderItemDTOList()) {
             // update quantity of product
             updateQuantityOfProduct(orderItem.getProduct(), orderItem.getQuantity());
+            // update total amount purchased of product
+            updatePurchasedOfProduct(orderItem.getProduct(), orderItem.getQuantity());
             // update quantity of set
             updateQuantityOfSet(orderItem.getSetId(), orderItem.getQuantity());
         }
@@ -99,6 +101,14 @@ public class OrderServiceImpl implements OrderService {
         );
         // update quantity
         productRepository.setProductQuantity(product.getId(), product.getQuantity() - soldQuantity);
+    }
+
+    private void updatePurchasedOfProduct(long productId, int soldQuantity) {
+        ProductEntity product = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "id", productId)
+        );
+        // update quantity
+        productRepository.setProductPurchased(product.getId(), product.getPurchased() + soldQuantity);
     }
 
     private void deleteALlCartInListId(List<Long> cartIds) {
