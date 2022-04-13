@@ -19,6 +19,9 @@ public class OrderItemEntity extends BaseEntity {
     @Column()
     private long product;
 
+    @Column(name = "set_id")
+    private long setId;
+
     @Column(nullable = false)
     private String name;
 

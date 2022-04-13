@@ -205,10 +205,11 @@ public class OrderServiceImpl implements OrderService {
         orderItemDTO.setId(orderItemEntity.getId());
         orderItemDTO.setImageUrl(orderItemEntity.getImageUrl());
         orderItemDTO.setName(orderItemEntity.getName());
-        orderItemDTO.setProduct(orderItemEntity.getProduct());
         orderItemDTO.setPrice((int) orderItemEntity.getPrice());
         orderItemDTO.setProperty(orderItemEntity.getProperty());
         orderItemDTO.setQuantity(orderItemEntity.getQuantity());
+        orderItemDTO.setProduct(orderItemEntity.getProduct());
+        orderItemDTO.setSetId(orderItemEntity.getSetId());
         return orderItemDTO;
     }
 
@@ -228,6 +229,8 @@ public class OrderServiceImpl implements OrderService {
         orderItemEntity.setCreateTime(new Timestamp(new Date().getTime()));
         orderItemEntity.setUpdateTime(new Timestamp(new Date().getTime()));
         orderItemEntity.setOrder(orderEntity);
+        orderItemEntity.setProduct(orderItemDTO.getProduct());
+        orderItemEntity.setSetId(orderItemDTO.getSetId());
         orderItemEntity.setProperty(makeStringPropertyBySet(setEntity));
         return orderItemEntity;
     }
