@@ -13,11 +13,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,26 +29,23 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ProvinceRepository provinceRepository;
     private final ProductRepository productRepository;
-    private final DistrictRepository districtRepository;
-    private final WardRepository wardRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
+    private final ProductPropertyRepository productPropertyRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, ModelMapper modelMapper, JwtTokenProvider jwtTokenProvider, ProvinceRepository provinceRepository, ProductRepository productRepository, DistrictRepository districtRepository, WardRepository wardRepository, OrderItemRepository orderItemRepository, CartRepository cartRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, ModelMapper modelMapper, JwtTokenProvider jwtTokenProvider, ProductRepository productRepository, OrderItemRepository orderItemRepository, CartRepository cartRepository, ProductPropertyRepository productPropertyRepository) {
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.modelMapper = modelMapper;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.provinceRepository = provinceRepository;
         this.productRepository = productRepository;
-        this.districtRepository = districtRepository;
-        this.wardRepository = wardRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartRepository = cartRepository;
+        this.productPropertyRepository = productPropertyRepository;
     }
+
 
     @Override
     public List<OrderDTO> findAllOrderByCustomerIdAndStatus(OrderStatus status, String accessToken) {
@@ -61,21 +60,45 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void addNewOrder(String accessToken, OrderDTO orderDTO) {
         String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
         CustomerEntity customer = customerRepository.findByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("Customer", "email", email)
         );
+
         OrderEntity orderEntity = mapToOrderEntity(orderDTO, customer);
-        List<OrderItemEntity> listOrderItemEntity = orderDTO.getOrderItemDTOList().stream().map(this::mapToOrderItemEntity).collect(Collectors.toList());
-        for (OrderItemEntity orderItemEntity : listOrderItemEntity) {
-            orderItemEntity.setOrder(orderEntity);
-            ProductEntity product = productRepository.findProductEntityById(orderItemEntity.getProduct());
-            productRepository.setProductQuantity(product.getId(), product.getQuantity() - orderItemEntity.getQuantity());
+        List<OrderItemEntity> listOrderItemEntity = orderDTO.getOrderItemDTOList().stream().map(orderItemDTO -> mapToOrderItemEntity(orderItemDTO, orderEntity)).collect(Collectors.toList());
+
+        for (OrderItemDTO orderItem : orderDTO.getOrderItemDTOList()) {
+            // update quantity of product
+            updateQuantityOfProduct(orderItem.getProduct(), orderItem.getQuantity());
+            // update quantity of set
+            updateQuantityOfSet(orderItem.getSetId(), orderItem.getQuantity());
         }
+        // add update total price of order
+        orderEntity.setTotalPrice(calculateTotalPrice(listOrderItemEntity));
         orderRepository.save(orderEntity);
         orderItemRepository.saveAll(listOrderItemEntity);
-        deleteALlCartInListId(orderDTO.getOrderItemDTOList().stream().map(OrderItemDTO::getCartId).collect(Collectors.toList()));
+        // clear cart
+        List<Long> cartIds = orderDTO.getOrderItemDTOList().stream().map(OrderItemDTO::getCartId).filter(aLong -> aLong != -1).collect(Collectors.toList());
+        deleteALlCartInListId(cartIds);
+    }
+
+    private void updateQuantityOfSet(long setId, int soldQuantity) {
+        SetEntity setEntity = productPropertyRepository.findById(setId).orElseThrow(
+                () -> new ResourceNotFoundException("Set entity", "id", setId)
+        );
+        int newQuantity = setEntity.getQuantity() - soldQuantity;
+        productPropertyRepository.updateSetQuantity(setId, newQuantity);
+    }
+
+    private void updateQuantityOfProduct(long productId, int soldQuantity) {
+        ProductEntity product = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "id", productId)
+        );
+        // update quantity
+        productRepository.setProductQuantity(product.getId(), product.getQuantity() - soldQuantity);
     }
 
     private void deleteALlCartInListId(List<Long> cartIds) {
@@ -189,11 +212,32 @@ public class OrderServiceImpl implements OrderService {
         return orderItemDTO;
     }
 
-    private OrderItemEntity mapToOrderItemEntity(OrderItemDTO orderItemDTO) {
-        OrderItemEntity orderItemEntity = modelMapper.map(orderItemDTO, OrderItemEntity.class);
+    private OrderItemEntity mapToOrderItemEntity(OrderItemDTO orderItemDTO, OrderEntity orderEntity) {
+        OrderItemEntity orderItemEntity = new OrderItemEntity();
+
+        ProductEntity product = productRepository.findById(orderItemDTO.getProduct()).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "id", orderItemDTO.getProduct())
+        );
+        SetEntity setEntity = productPropertyRepository.findById(orderItemDTO.getSetId()).orElseThrow(
+                () -> new ResourceNotFoundException("Set", "id", orderItemDTO.getSetId())
+        );
+        orderItemEntity.setName(product.getName());
+        orderItemEntity.setImageUrl(product.getProductImages().get(0).getImageUrl());
+        orderItemEntity.setPrice(product.getPrice() + setEntity.getAdditionalPrice());
+        orderItemEntity.setQuantity(orderItemDTO.getQuantity());
         orderItemEntity.setCreateTime(new Timestamp(new Date().getTime()));
         orderItemEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        orderItemEntity.setOrder(orderEntity);
+        orderItemEntity.setProperty(makeStringPropertyBySet(setEntity));
         return orderItemEntity;
+    }
+
+    private String makeStringPropertyBySet(SetEntity setEntity) {
+        StringBuilder property = new StringBuilder();
+        for (SetValueEntity setValueEntity : setEntity.getSetValueEntity()) {
+            property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
+        }
+        return property.toString();
     }
 
     private OrderDTO mapToOrderDTO(OrderEntity orderEntity) {
@@ -215,22 +259,29 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setUpdateTime(new Timestamp(new Date().getTime()));
         orderEntity.setCustomer(customerEntity);
         orderEntity.setDeliveryAddress(orderDTO.getAddress());
-        orderEntity.setTotalPrice(orderDTO.getTotalPrice());
         orderEntity.setStatus(OrderStatus.Pending);
         return orderEntity;
     }
 
-    private OrderStatus mapToOrderStatus(int statusInt) {
-        if (statusInt == 0) {
-            return OrderStatus.Pending;
-        } else if (statusInt == 1) {
-            return OrderStatus.Confirmed;
-        } else if (statusInt == 2) {
-            return OrderStatus.Delivering;
-        } else if (statusInt == 3) {
-            return OrderStatus.Success;
-        } else {
-            return OrderStatus.Cancel;
+    private int calculateTotalPrice(List<OrderItemEntity> orderItemEntities) {
+        int totalPrice = 0;
+        for (OrderItemEntity orderItem : orderItemEntities) {
+            totalPrice += orderItem.getPrice() * orderItem.getQuantity();
         }
+        return totalPrice;
     }
+
+//    private OrderStatus mapToOrderStatus(int statusInt) {
+//        if (statusInt == 0) {
+//            return OrderStatus.Pending;
+//        } else if (statusInt == 1) {
+//            return OrderStatus.Confirmed;
+//        } else if (statusInt == 2) {
+//            return OrderStatus.Delivering;
+//        } else if (statusInt == 3) {
+//            return OrderStatus.Success;
+//        } else {
+//            return OrderStatus.Cancel;
+//        }
+//    }
 }

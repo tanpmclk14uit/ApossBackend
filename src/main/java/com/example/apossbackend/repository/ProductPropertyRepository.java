@@ -4,9 +4,11 @@ import com.example.apossbackend.model.dto.ProductPropertyDTO;
 import com.example.apossbackend.model.dto.ProductPropertyValueDTO;
 import com.example.apossbackend.model.entity.SetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 public interface ProductPropertyRepository extends JpaRepository<SetEntity, Long> {
@@ -60,4 +62,9 @@ public interface ProductPropertyRepository extends JpaRepository<SetEntity, Long
     void deleteSetEntitiesByProductId(long id);
 
     List<SetEntity> getSetEntitiesByProductId(long id);
+
+    @Transactional()
+    @Modifying( clearAutomatically = true)
+    @Query("update SetEntity setEntity set setEntity.quantity = :quantity WHERE setEntity.id = :setId")
+    void updateSetQuantity(@Param("setId") Long id, @Param("quantity") int quantity);
 }
