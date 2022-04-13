@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.persistence.criteria.From;
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductPropertyRepository extends JpaRepository<SetEntity, Long> {
 
@@ -58,4 +56,8 @@ public interface ProductPropertyRepository extends JpaRepository<SetEntity, Long
             "group by sop.id " +
             "having count(distinct sv.classifyProductValue.id) = :propertyValuesCount")
     List<Long> getSetOfProductBySpecifyPropertyValuesIdAndProductId(@Param("productId") long productId, @Param("propertyValues") List<Long> propertyValuesId, @Param("propertyValuesCount") long propertyValuesCount);
+
+    void deleteSetEntitiesByProductId(long id);
+
+    List<SetEntity> getSetEntitiesByProductId(long id);
 }

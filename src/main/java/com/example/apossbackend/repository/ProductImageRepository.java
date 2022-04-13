@@ -11,4 +11,6 @@ public interface ProductImageRepository extends JpaRepository<ProductImageEntity
 
     Page<ProductImageEntity> findProductImageEntitiesByProductId(long id, Pageable pageable);
 
+    void deleteProductImageEntitiesByProductId(long id);
+
 }

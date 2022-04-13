@@ -58,6 +58,5 @@ public interface ProductService {
     void deleteProductPropertyValueById(long id);
 
     void createNewSetForProduct(SetDTO setDTO, long productId);
-//    void removePropertyValueOfProduct(SetDTO setDTO);
-//    void updatePropertyValueForProduct(SetDTO setDTO);
+
 }
