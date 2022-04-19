@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity orderEntity = mapToOrderEntity(orderDTO, customer);
         List<OrderItemEntity> listOrderItemEntity = orderDTO.getOrderItemDTOList().stream().map(orderItemDTO -> mapToOrderItemEntity(orderItemDTO, orderEntity)).collect(Collectors.toList());
 
-        for (OrderItemDTO orderItem : orderDTO.getOrderItemDTOList()) {
+        for (OrderItemEntity orderItem : listOrderItemEntity) {
             // update quantity of product
             updateQuantityOfProduct(orderItem.getProduct(), orderItem.getQuantity());
             // update total amount purchased of product
@@ -211,6 +211,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderItemDTO mapToOrderItemDTO(OrderItemEntity orderItemEntity) {
+        SetEntity setEntity = productPropertyRepository.findById(orderItemEntity.getSetId()).orElseThrow(
+                () -> new ResourceNotFoundException("Set", "id", orderItemEntity.getSetId())
+        );
         OrderItemDTO orderItemDTO = new OrderItemDTO();
         orderItemDTO.setId(orderItemEntity.getId());
         orderItemDTO.setImageUrl(orderItemEntity.getImageUrl());
@@ -218,7 +221,6 @@ public class OrderServiceImpl implements OrderService {
         orderItemDTO.setPrice((int) orderItemEntity.getPrice());
         orderItemDTO.setProperty(orderItemEntity.getProperty());
         orderItemDTO.setQuantity(orderItemEntity.getQuantity());
-        orderItemDTO.setProduct(orderItemEntity.getProduct());
         orderItemDTO.setSetId(orderItemEntity.getSetId());
         return orderItemDTO;
     }
@@ -226,11 +228,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemEntity mapToOrderItemEntity(OrderItemDTO orderItemDTO, OrderEntity orderEntity) {
         OrderItemEntity orderItemEntity = new OrderItemEntity();
 
-        ProductEntity product = productRepository.findById(orderItemDTO.getProduct()).orElseThrow(
-                () -> new ResourceNotFoundException("Product", "id", orderItemDTO.getProduct())
-        );
         SetEntity setEntity = productPropertyRepository.findById(orderItemDTO.getSetId()).orElseThrow(
                 () -> new ResourceNotFoundException("Set", "id", orderItemDTO.getSetId())
+        );
+        long productId = setEntity.getProduct().getId();
+        ProductEntity product = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "id", productId)
         );
         orderItemEntity.setName(product.getName());
         orderItemEntity.setImageUrl(product.getProductImages().get(0).getImageUrl());
@@ -239,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
         orderItemEntity.setCreateTime(new Timestamp(new Date().getTime()));
         orderItemEntity.setUpdateTime(new Timestamp(new Date().getTime()));
         orderItemEntity.setOrder(orderEntity);
-        orderItemEntity.setProduct(orderItemDTO.getProduct());
+        orderItemEntity.setProduct(productId);
         orderItemEntity.setSetId(orderItemDTO.getSetId());
         orderItemEntity.setProperty(makeStringPropertyBySet(setEntity));
         return orderItemEntity;
