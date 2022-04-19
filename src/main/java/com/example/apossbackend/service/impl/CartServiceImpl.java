@@ -3,10 +3,7 @@ package com.example.apossbackend.service.impl;
 import com.example.apossbackend.exception.ApossBackendException;
 import com.example.apossbackend.exception.ResourceNotFoundException;
 import com.example.apossbackend.model.dto.CartDTO;
-import com.example.apossbackend.model.entity.CartEntity;
-import com.example.apossbackend.model.entity.CustomerEntity;
-import com.example.apossbackend.model.entity.ProductEntity;
-import com.example.apossbackend.model.entity.SetEntity;
+import com.example.apossbackend.model.entity.*;
 import com.example.apossbackend.repository.CartRepository;
 import com.example.apossbackend.repository.CustomerRepository;
 import com.example.apossbackend.repository.ProductPropertyRepository;
@@ -107,9 +104,17 @@ public class CartServiceImpl implements CartService {
         );
         cartEntity.setSet(set);
         cartEntity.setQuantity(cartDTO.getQuantity());
-        cartEntity.setProperty(cartDTO.getProperty());
+        cartEntity.setProperty(makeStringPropertyBySet(set));
         cartEntity.setSelect(cartDTO.isSelect());
         return cartEntity;
+    }
+
+    private String makeStringPropertyBySet(SetEntity setEntity) {
+        StringBuilder property = new StringBuilder();
+        for (SetValueEntity setValueEntity : setEntity.getSetValueEntity()) {
+            property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
+        }
+        return property.toString();
     }
 
     private CartDTO mapToCartDTO(CartEntity cartEntity) {
