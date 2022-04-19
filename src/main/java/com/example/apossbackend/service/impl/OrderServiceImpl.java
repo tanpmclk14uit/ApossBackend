@@ -251,7 +251,11 @@ public class OrderServiceImpl implements OrderService {
     private String makeStringPropertyBySet(SetEntity setEntity) {
         StringBuilder property = new StringBuilder();
         for (SetValueEntity setValueEntity : setEntity.getSetValueEntity()) {
-            property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
+            if (setValueEntity.getClassifyProductValue().getId() == 0) {
+                property.append(" ");
+            } else {
+                property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
+            }
         }
         return property.toString();
     }
