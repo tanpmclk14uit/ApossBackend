@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.example.apossbackend.service.impl.CartServiceImpl.getString;
+
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -249,15 +251,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private String makeStringPropertyBySet(SetEntity setEntity) {
-        StringBuilder property = new StringBuilder();
-        for (SetValueEntity setValueEntity : setEntity.getSetValueEntity()) {
-            if (setValueEntity.getClassifyProductValue().getId() == 0) {
-                property.append(" ");
-            } else {
-                property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
-            }
-        }
-        return property.toString();
+        return getString(setEntity);
     }
 
     private OrderDTO mapToOrderDTO(OrderEntity orderEntity) {

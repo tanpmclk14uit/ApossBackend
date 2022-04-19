@@ -110,9 +110,17 @@ public class CartServiceImpl implements CartService {
     }
 
     private String makeStringPropertyBySet(SetEntity setEntity) {
+        return getString(setEntity);
+    }
+
+    static String getString(SetEntity setEntity) {
         StringBuilder property = new StringBuilder();
         for (SetValueEntity setValueEntity : setEntity.getSetValueEntity()) {
-            property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
+            if (setValueEntity.getClassifyProductValue().getId() == 0) {
+                property.append(" ");
+            } else {
+                property.append(setValueEntity.getClassifyProductValue().getClassifyProduct().getName()).append(": ").append(setValueEntity.getClassifyProductValue().getName()).append(", ");
+            }
         }
         return property.toString();
     }
