@@ -63,6 +63,8 @@ public interface ProductPropertyRepository extends JpaRepository<SetEntity, Long
 
     List<SetEntity> getSetEntitiesByProductId(long id);
 
+    boolean existsSetEntityByProductId(long id);
+
     @Transactional()
     @Modifying( clearAutomatically = true)
     @Query("update SetEntity setEntity set setEntity.quantity = :quantity WHERE setEntity.id = :setId")

@@ -52,12 +52,10 @@ public interface ProductService {
 
     void deleteProductImageById(Long id);
 
-    void createNewProductProperty(ProductPropertyDTO productPropertyDTO);
-    void deleteProductPropertyById(long id);
-
-    void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId);
-    void deleteProductPropertyValueById(long id);
-
     void createNewSetForProduct(SetDTO setDTO, long productId);
+
+    void deleteSetOfProduct(long setDTOId, long productId);
+
+    void updateSetOfProduct(SetDTO setDTO);
 
 }

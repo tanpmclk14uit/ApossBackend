@@ -269,10 +269,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(product.getId());
     }
 
-    private void deleteAllSetValueBySetId(long id) {
-
-    }
-
     @Override
     public void createNewProductImage(NewProductImageDTO newImage) {
         ProductImageEntity productImage = new ProductImageEntity();
@@ -302,54 +298,59 @@ public class ProductServiceImpl implements ProductService {
         productImageRepository.deleteById(id);
     }
 
-    @Override
-    public void createNewProductProperty(ProductPropertyDTO productPropertyDTO) {
-        ClassifyProductEntity classifyProductEntity = new ClassifyProductEntity();
-        classifyProductEntity.setName(productPropertyDTO.getName());
-        classifyProductEntity.setPropertyColor(productPropertyDTO.isColor());
-        classifyProductEntity.setCreateTime(new Timestamp(new Date().getTime()));
-        classifyProductEntity.setUpdateTime(new Timestamp(new Date().getTime()));
-        classifyProductRepository.save(classifyProductEntity);
-    }
 
     @Override
-    public void deleteProductPropertyById(long id) {
-        classifyProductRepository.deleteById(id);
-    }
-
-    @Override
-    public void createNewProductPropertyValue(ProductPropertyValueDTO productPropertyValueDTO, long propertyId) {
-        ClassifyProductValueEntity classifyProductValueEntity = new ClassifyProductValueEntity();
-        classifyProductValueEntity.setName(productPropertyValueDTO.getName());
-        classifyProductValueEntity.setValue(productPropertyValueDTO.getValue());
-        ClassifyProductEntity classifyProductEntity = classifyProductRepository.findById(propertyId).orElseThrow(
-                () -> new ResourceNotFoundException("Classify product", "id", propertyId)
-        );
-        classifyProductValueEntity.setClassifyProduct(classifyProductEntity);
-        classifyProductValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
-        classifyProductValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
-        classifyProductValueRepository.save(classifyProductValueEntity);
-    }
-
-    @Override
-    public void deleteProductPropertyValueById(long id) {
-        classifyProductValueRepository.deleteById(id);
-    }
-
-    @Override
+    @Transactional
     public void createNewSetForProduct(SetDTO setDTO, long productId) {
-
         SetEntity setEntity = new SetEntity();
         ProductEntity product = productRepository.findById(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Product", "Id", productId)
         );
+        long setId = getSetIdByValuesIds(List.of(0L), productId);
+        if (setId != -1) {
+            productPropertyRepository.deleteById(setId);
+        }
         setEntity.setAdditionalPrice(setDTO.getAdditionalPrice());
         setEntity.setQuantity(setDTO.getQuantity());
         setEntity.setProduct(product);
+        setEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        setEntity.setUpdateTime(new Timestamp(new Date().getTime()));
         setEntity = productPropertyRepository.saveAndFlush(setEntity);
         for (long id : setDTO.getValueIds()) {
             createNewSetValueEntity(setEntity, id);
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteSetOfProduct(long setDTOId, long productId) {
+        // check if set exists
+        SetEntity setEntity = productPropertyRepository.findById(setDTOId).orElseThrow(
+                () -> new ResourceNotFoundException("Set", "Id", setDTOId)
+        );
+        // check if product exists
+        ProductEntity product = productRepository.findById(productId).orElseThrow(
+                () -> new ResourceNotFoundException("Product", "Id", productId)
+        );
+        // delete all values of set
+        setValueRepository.deleteSetValueEntitiesBySetId(setDTOId);
+        // delete set
+        productPropertyRepository.delete(setEntity);
+        // create default set if used remove all set
+        if (!productPropertyRepository.existsSetEntityByProductId(productId)) {
+            createDefaultSetForProduct(productId, product.getQuantity());
+        }
+    }
+
+    @Override
+    public void updateSetOfProduct(SetDTO setDTO) {
+        SetEntity setEntity = productPropertyRepository.findById(setDTO.getSetId()).orElseThrow(
+                () -> new ResourceNotFoundException("Set", "Id", setDTO.getSetId())
+        );
+        setEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        setEntity.setQuantity(setDTO.getQuantity());
+        setEntity.setAdditionalPrice(setDTO.getAdditionalPrice());
+        productPropertyRepository.save(setEntity);
     }
 
     private void createNewSetValueEntity(SetEntity setEntity, long propertyValueId) {
@@ -359,6 +360,8 @@ public class ProductServiceImpl implements ProductService {
         SetValueEntity setValueEntity = new SetValueEntity();
         setValueEntity.setSet(setEntity);
         setValueEntity.setClassifyProductValue(classifyProductValueEntity);
+        setValueEntity.setCreateTime(new Timestamp(new Date().getTime()));
+        setValueEntity.setUpdateTime(new Timestamp(new Date().getTime()));
         setValueRepository.save(setValueEntity);
     }
 }
