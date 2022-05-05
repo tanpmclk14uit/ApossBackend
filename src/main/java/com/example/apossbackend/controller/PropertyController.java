@@ -5,10 +5,8 @@ import com.example.apossbackend.model.dto.PropertyValueDTO;
 import com.example.apossbackend.service.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,5 +32,51 @@ public class PropertyController {
         return ResponseEntity.ok(propertyService.getAllPropertyValuesByPropertyId(id));
     }
 
+    @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Long> addNewProperty(
+            @RequestBody PropertyDTO propertyDTO
+    ) {
+        return ResponseEntity.ok(propertyService.addNewProperty(propertyDTO));
+    }
 
+    @PostMapping("/{id}/value")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Long> addNewPropertyValueForProperty(
+            @RequestBody PropertyValueDTO newPropertyValue,
+            @PathVariable("id") Long propertyId) {
+        return ResponseEntity.ok(propertyService.addNewPropertyValueForProperty(newPropertyValue, propertyId));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> updatePropertyNameByPropertyId(
+            @RequestBody String newName,
+            @PathVariable("id") Long propertyId) {
+        propertyService.updatePropertyNameByPropertyId(newName, propertyId);
+        return ResponseEntity.ok("\"Update property success\"");
+    }
+
+    @PutMapping("/value/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> updatePropertyValueByPropertyValueId(
+            @RequestBody PropertyValueDTO propertyValueDTO,
+            @PathVariable("id") Long propertyValueId) {
+        propertyService.updatePropertyValueByPropertyValueId(propertyValueDTO, propertyValueId);
+        return ResponseEntity.ok("\"Update property value success\"");
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deletePropertyById(
+            @PathVariable("id") Long propertyId) {
+        return ResponseEntity.ok(propertyService.deletePropertyById(propertyId));
+    }
+
+    @DeleteMapping("/value/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deletePropertyValueById(
+            @PathVariable("id") long propertyValueId) {
+        return ResponseEntity.ok(propertyService.deletePropertyValueById(propertyValueId));
+    }
 }

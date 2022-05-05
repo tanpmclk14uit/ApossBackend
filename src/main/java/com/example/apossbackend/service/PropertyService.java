@@ -16,6 +16,10 @@ public interface PropertyService {
 
     void updatePropertyNameByPropertyId(String newName, Long propertyId);
 
-    void updatePropertyValueByPropertyValueId(Long propertyValueId);
+    void updatePropertyValueByPropertyValueId(PropertyValueDTO propertyValueDTO, Long propertyValueId);
+
+    String deletePropertyById(Long propertyId);
+
+    String deletePropertyValueById(long propertyValueId);
 
 }

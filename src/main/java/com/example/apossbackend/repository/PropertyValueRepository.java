@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PropertyValueRepository extends JpaRepository<ClassifyProductValueEntity, Long> {
     List<ClassifyProductValueEntity> findClassifyProductValueEntitiesByClassifyProductId(Long classifyProductId);
+    void deleteAllByClassifyProductId(Long id);
 }

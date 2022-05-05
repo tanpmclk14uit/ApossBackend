@@ -8,9 +8,8 @@ import java.util.Optional;
 
 public interface ClassifyProductValueRepository extends JpaRepository<ClassifyProductValueEntity, Long> {
 
-    Optional<List<ClassifyProductValueEntity>> findClassifyProductValueEntitiesByClassifyProductId(long id);
-
     @Override
     Optional<ClassifyProductValueEntity> findById(Long aLong);
+
 
 }
