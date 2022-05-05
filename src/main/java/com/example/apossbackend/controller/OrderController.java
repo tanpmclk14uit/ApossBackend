@@ -73,7 +73,7 @@ public class OrderController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.cancelOrder(orderId, cancelReason, accessToken);
-        return ResponseEntity.ok("\"Update cart success\"");
+        return ResponseEntity.ok("\"Cancel order success\"");
     }
 
     @PutMapping("/success-order-customer/{id}")
@@ -83,7 +83,7 @@ public class OrderController {
     ){
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.makeSuccessOrder(orderId, accessToken);
-        return ResponseEntity.ok("\"Update cart success\"");
+        return ResponseEntity.ok("\"Update order success\"");
     }
 
     @PutMapping("/change-order-status/{id}")
@@ -93,7 +93,7 @@ public class OrderController {
             @RequestBody OrderStatus orderStatus
     ){
         orderService.changeOrderStatus(orderId, orderStatus);
-        return ResponseEntity.ok("\"Update cart success\"");
+        return ResponseEntity.ok("\"Update order success\"");
     }
 
     @GetMapping("/order-by-status")
@@ -119,7 +119,7 @@ public class OrderController {
             @RequestBody String cancelReason
     ){
         orderService.cancelOrderSeller(orderId, cancelReason);
-        return ResponseEntity.ok("\"Update cart success\"");
+        return ResponseEntity.ok("\"Update order success\"");
     }
 
 
