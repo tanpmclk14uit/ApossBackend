@@ -18,8 +18,8 @@ public interface PropertyService {
 
     void updatePropertyValueByPropertyValueId(PropertyValueDTO propertyValueDTO, Long propertyValueId);
 
-    String deletePropertyById(Long propertyId);
+    Boolean deletePropertyByIdSuccess(Long propertyId);
 
-    String deletePropertyValueById(long propertyValueId);
+    Boolean deletePropertyValueByIdSuccess(long propertyValueId);
 
 }

@@ -4,6 +4,7 @@ import com.example.apossbackend.model.dto.PropertyDTO;
 import com.example.apossbackend.model.dto.PropertyValueDTO;
 import com.example.apossbackend.service.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -70,13 +71,21 @@ public class PropertyController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deletePropertyById(
             @PathVariable("id") Long propertyId) {
-        return ResponseEntity.ok(propertyService.deletePropertyById(propertyId));
+        if (propertyService.deletePropertyByIdSuccess(propertyId)) {
+            return ResponseEntity.ok("\"Delete property success\"");
+        } else {
+            return new ResponseEntity<String>("\"Can't delete property applied for product\"", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/value/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deletePropertyValueById(
             @PathVariable("id") long propertyValueId) {
-        return ResponseEntity.ok(propertyService.deletePropertyValueById(propertyValueId));
+        if (propertyService.deletePropertyValueByIdSuccess(propertyValueId)) {
+            return ResponseEntity.ok("\"Delete property value success\"");
+        } else {
+            return new ResponseEntity<String>("\"Can't delete property value applied for product\"", HttpStatus.BAD_REQUEST);
+        }
     }
 }

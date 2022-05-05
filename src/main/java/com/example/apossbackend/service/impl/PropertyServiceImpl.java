@@ -98,25 +98,23 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     @Transactional
-    public String deletePropertyById(Long propertyId) {
-        if (setValueRepository.countSetValueEntitiesByClassifyProductId(propertyId) > 0) {
+    public Boolean deletePropertyByIdSuccess(Long propertyId) {
+        if (setValueRepository.countSetValueEntitiesByClassifyProductId(propertyId) == 0) {
             propertyValueRepository.deleteAllByClassifyProductId(propertyId);
             propertyRepository.deleteById(propertyId);
-            return "Delete property success";
+            return true;
         } else {
-
-            return "Can't not delete property applied for product";
+            return false;
         }
     }
 
     @Override
-    public String deletePropertyValueById(long propertyValueId) {
-        if (setValueRepository.existsSetValueEntityByClassifyProductValueId(propertyValueId)) {
+    public Boolean deletePropertyValueByIdSuccess(long propertyValueId) {
+        if (!setValueRepository.existsSetValueEntityByClassifyProductValueId(propertyValueId)) {
             propertyValueRepository.deleteById(propertyValueId);
-            return "Delete property value success";
+            return true;
         } else {
-
-            return "Can't not delete property value applied for product";
+            return false;
         }
     }
 
