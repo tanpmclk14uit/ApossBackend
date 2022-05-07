@@ -18,5 +18,6 @@ public class OrderDTO {
     private String address;
     private int totalPrice;
     private String cancelReason;
+    private String customerEmail;
     private List<OrderItemDTO> orderItemDTOList;
 }

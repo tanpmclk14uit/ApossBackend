@@ -260,6 +260,7 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderDTO mapToOrderDTO(OrderEntity orderEntity) {
         OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setCustomerEmail(orderEntity.getCustomer().getEmail());
         orderDTO.setId(orderEntity.getId());
         orderDTO.setOrderTime(orderEntity.getCreateTime());
         orderDTO.setOrderStatus(orderEntity.getStatus());
