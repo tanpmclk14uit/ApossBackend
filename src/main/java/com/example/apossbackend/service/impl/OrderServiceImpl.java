@@ -48,6 +48,10 @@ public class OrderServiceImpl implements OrderService {
         this.productPropertyRepository = productPropertyRepository;
     }
 
+    @Override
+    public List<OrderDTO> getAllOrder() {
+        return orderRepository.findAll().stream().map(this::mapToOrderDTO).collect(Collectors.toList());
+    }
 
     @Override
     public List<OrderDTO> findAllOrderByCustomerIdAndStatus(OrderStatus status, String accessToken) {

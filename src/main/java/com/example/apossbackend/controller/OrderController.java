@@ -30,17 +30,22 @@ public class OrderController {
     @GetMapping()
     public ResponseEntity<List<OrderDTO>> getAllOrderByCustomerIdAndStatus(
             HttpServletRequest request
-    ){
+    ) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         return ResponseEntity.ok(orderService.findAllOrderByCustomerIdAndStatus(OrderStatus.Pending, accessToken));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDTO>> getAllOrder() {
+        return ResponseEntity.ok(orderService.getAllOrder());
     }
 
     @PostMapping
     public ResponseEntity<String> addNewOrder(
             @RequestBody OrderDTO orderDTO,
             HttpServletRequest request
-    )
-    {
+    ) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.addNewOrder(accessToken, orderDTO);
         return ResponseEntity.ok("\"Add new order success !\"");
@@ -51,7 +56,7 @@ public class OrderController {
     public ResponseEntity<List<OrderDTO>> getAllOrderByCustomerAndStatus(
             @RequestParam("status") OrderStatus orderStatus,
             HttpServletRequest request
-    ){
+    ) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         return ResponseEntity.ok(orderService.findAllOrderByCustomerIdAndStatus(orderStatus, accessToken));
     }
@@ -60,7 +65,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> getAllOrderByCustomerAndStatus(
             @PathVariable(value = "id") long id,
             HttpServletRequest request
-    ){
+    ) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         return ResponseEntity.ok(orderService.findOrderByCustomerIdAndOrderId(id, accessToken));
     }
@@ -70,7 +75,7 @@ public class OrderController {
             @PathVariable(value = "id") long orderId,
             @RequestBody String cancelReason,
             HttpServletRequest request
-    ){
+    ) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.cancelOrder(orderId, cancelReason, accessToken);
         return ResponseEntity.ok("\"Cancel order success\"");
@@ -80,7 +85,7 @@ public class OrderController {
     public ResponseEntity<String> makeSuccessOrder(
             @PathVariable(value = "id") long orderId,
             HttpServletRequest request
-    ){
+    ) {
         String accessToken = jwtTokenProvider.getJWTFromRequest(request);
         orderService.makeSuccessOrder(orderId, accessToken);
         return ResponseEntity.ok("\"Update order success\"");
@@ -91,7 +96,7 @@ public class OrderController {
     public ResponseEntity<String> changeOrderStatus(
             @PathVariable(value = "id") long orderId,
             @RequestBody OrderStatus orderStatus
-    ){
+    ) {
         orderService.changeOrderStatus(orderId, orderStatus);
         return ResponseEntity.ok("\"Update order success\"");
     }
@@ -100,7 +105,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDTO>> getAllOrderByStatus(
             @RequestParam("status") OrderStatus orderStatus
-    ){
+    ) {
         List<OrderDTO> listOrder = orderService.findAllOrderByStatus(orderStatus);
         System.out.println(listOrder.size());
         return ResponseEntity.ok(listOrder);
@@ -108,7 +113,7 @@ public class OrderController {
 
     @GetMapping("/on-place-order")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Integer> countAllOnPlaceOrder(){
+    public ResponseEntity<Integer> countAllOnPlaceOrder() {
         return ResponseEntity.ok(orderService.countAllOnPlaceOrder());
     }
 
@@ -117,7 +122,7 @@ public class OrderController {
     public ResponseEntity<String> cancelOrderSeller(
             @PathVariable(value = "id") long orderId,
             @RequestBody String cancelReason
-    ){
+    ) {
         orderService.cancelOrderSeller(orderId, cancelReason);
         return ResponseEntity.ok("\"Update order success\"");
     }
