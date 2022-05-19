@@ -1,12 +1,10 @@
 package com.example.apossbackend.controller;
 
 import com.example.apossbackend.model.dto.OrderDTO;
-import com.example.apossbackend.model.dto.OrderItemDTO;
 import com.example.apossbackend.security.JwtTokenProvider;
 import com.example.apossbackend.service.OrderService;
 import com.example.apossbackend.utils.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +68,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findOrderByCustomerIdAndOrderId(id, accessToken));
     }
 
-    @PutMapping("/cancel-order-customer/{id}")
+    @PutMapping("/{id}/cancel")
     public ResponseEntity<String> cancelOrder(
             @PathVariable(value = "id") long orderId,
             @RequestBody String cancelReason,
@@ -80,6 +78,18 @@ public class OrderController {
         orderService.cancelOrder(orderId, cancelReason, accessToken);
         return ResponseEntity.ok("\"Cancel order success\"");
     }
+
+    @PutMapping("{id}/address")
+    public ResponseEntity<String> changeOrderAddress(
+            @PathVariable(value = "id") long orderId,
+            @RequestBody String newAddress,
+            HttpServletRequest request
+    ) {
+        String accessToken = jwtTokenProvider.getJWTFromRequest(request);
+        orderService.changeOrderAddress(orderId, newAddress, accessToken);
+        return ResponseEntity.ok("\"Change address success\"");
+    }
+
 
     @PutMapping("/success-order-customer/{id}")
     public ResponseEntity<String> makeSuccessOrder(

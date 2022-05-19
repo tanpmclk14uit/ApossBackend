@@ -65,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+
     @Override
     @Transactional
     public void addNewOrder(String accessToken, OrderDTO orderDTO) {
@@ -155,6 +156,24 @@ public class OrderServiceImpl implements OrderService {
                 } else {
                     throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
                 }
+            }
+        } else {
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");
+        }
+    }
+
+    @Override
+    public void changeOrderAddress(long orderId, String newAddress, String accessToken) {
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
+                () -> new ResourceNotFoundException("order", "id", orderId)
+        );
+        String email = jwtTokenProvider.getUsernameFromJWT(accessToken);
+        if (email.equals(orderEntity.getCustomer().getEmail())) {
+            if (orderEntity.getStatus() == OrderStatus.Pending || orderEntity.getStatus() == OrderStatus.Confirmed) {
+                orderEntity.setDeliveryAddress(newAddress);
+                orderRepository.save(orderEntity);
+            } else {
+                throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Can only change order status of pending or confirmed order");
             }
         } else {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "You don't have permission to do this action!");

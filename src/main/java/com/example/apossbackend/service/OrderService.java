@@ -26,4 +26,6 @@ public interface OrderService {
     void cancelOrderSeller(long orderId, String cancelReason);
 
     void makeSuccessOrder(long orderId, String accessToken);
+
+    void changeOrderAddress(long orderId, String newAddress, String accessToken);
 }
