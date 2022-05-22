@@ -105,7 +105,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> changeOrderStatus(
             @PathVariable(value = "id") long orderId,
-            @RequestBody OrderStatus orderStatus
+            @RequestParam("status") OrderStatus orderStatus
     ) {
         orderService.changeOrderStatus(orderId, orderStatus);
         return ResponseEntity.ok("\"Update order success\"");
