@@ -30,7 +30,7 @@ jobs:
           host: ${{ secrets.SSH_HOST  }}        
           username: ${{ secrets.SSH_USERNAME }}      
           password: ${{ secrets.SSH_PWD }}
-          port: 22
+          port: 56559
           source: "target/ApossBackend-0.0.1-SNAPSHOT.jar"      
           target: "~/ApossBackend/build"
           rm: true
