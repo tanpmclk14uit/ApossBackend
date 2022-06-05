@@ -94,7 +94,7 @@ public class JwtTokenProvider  {
         }catch (SignatureException ex){
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid JWT token");
+            throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Invalid JWT token ");
         } catch (ExpiredJwtException ex) {
             throw new ApossBackendException(HttpStatus.BAD_REQUEST, "Expired JWT token");
         } catch (UnsupportedJwtException ex) {

@@ -1,9 +1,6 @@
 package com.example.apossbackend.model.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,6 +9,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name= "industry_image")
 public class IndustryImageEntity extends BaseEntity{
 

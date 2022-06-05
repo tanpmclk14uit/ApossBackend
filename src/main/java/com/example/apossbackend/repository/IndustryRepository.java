@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndustryRepository extends JpaRepository<IndustryEntity, Long> {
+    boolean existsIndustryEntityById(long id);
 }
