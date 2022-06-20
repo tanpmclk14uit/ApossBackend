@@ -34,21 +34,22 @@ public class KindController {
     }
 
     @PostMapping("/add_kind")
-    @PreAuthorize("HasRole('Admin')")
-    public ResponseEntity<String> addKind(@RequestBody KindDTO kindDTO, long industryId){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> addKind(@RequestBody KindDTO kindDTO,
+                                          @RequestBody long industryId){
         kindService.addKind(kindDTO, industryId);
         return ResponseEntity.ok("add industry success");
     }
 
     @DeleteMapping("/delete_kind")
-    @PreAuthorize("HasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteKind(@RequestBody long id){
         kindService.deleteKind(id);
         return ResponseEntity.ok("Delete industry success");
     }
 
     @PutMapping("/update_kind")
-    @PreAuthorize("Hasrole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateKind(@RequestBody KindDTO kindDTO,
                                                        @RequestBody long id) {
         kindService.updateKind(kindDTO, id);

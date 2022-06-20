@@ -25,21 +25,21 @@ public class IndustryController {
     }
 
     @PostMapping("/add_industry")
-    @PreAuthorize("HasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> addDetailCategory(@RequestBody DetailCategoryDTO detailCategoryDTO){
         industryService.addIndustry(detailCategoryDTO);
         return ResponseEntity.ok("add industry success");
     }
 
     @DeleteMapping("/delete_industry")
-    @PreAuthorize("HasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteDetailCategory(@RequestBody long id){
         industryService.deleteIndustry(id);
         return ResponseEntity.ok("Delete industry success");
     }
 
     @PutMapping("/update_industry")
-    @PreAuthorize("Hasrole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateDetailCategory(@RequestBody DetailCategoryDTO newDetailCategoryDTO,
                                                        @RequestBody long id){
         industryService.updateIndustry(newDetailCategoryDTO, id);
